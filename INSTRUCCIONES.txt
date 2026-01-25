@@ -24,8 +24,7 @@ git commit -m "UI: Descripción de lo que hiciste"
 (Ejemplo: git commit -m "UI: Ajuste de colores institucionales en b.e").
 
 Sincronizar con la nube (Push): 
-git push origin 
-feature/complemento-de-contenido-pedagogico (Esto sube tu rama de trabajo a GitHub).
+git push origin feature/complemento-de-contenido-pedagogico (Esto sube tu rama de trabajo a GitHub).
 
 Tip extra
 Antes de cerrar el VS Code hoy, verifica que tu git status te devuelva el mensaje: 
