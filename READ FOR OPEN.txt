@@ -12,3 +12,36 @@ Liberar los permisos de ejecución: Set-ExecutionPolicy Unrestricted -Scope Proc
 Activa el venv: venv\Scripts\activate
 
 Lanza el servidor: uvicorn main:app --reload
+
+Verificar la rama: git branch
+
+Preparar los archivos: 
+git add . 
+(Esto le dice a Git: "Toma todos mis cambios y ponlos en la sala de espera").
+
+Guardar el progreso (Commit): 
+git commit -m "UI: Descripción de lo que hiciste" 
+(Ejemplo: git commit -m "UI: Ajuste de colores institucionales en b.e").
+
+Sincronizar con la nube (Push): 
+git push origin 
+feature/complemento-de-contenido-pedagogico (Esto sube tu rama de trabajo a GitHub).
+
+Tip extra
+Antes de cerrar el VS Code hoy, verifica que tu git status te devuelva el mensaje: 
+"nothing to commit, working tree clean". 
+Eso significa que tu código está 100% a salvo tanto en tu PC como en la nube.
+
+Detener el servidor: Presiona
+Ctrl + C en la terminal. 
+(Esto apaga el proceso de Uvicorn de forma segura).
+
+Actualizar lista de librerías: 
+pip freeze > requirements.txt 
+(Muy importante: guarda la "receta" de instalación por si cambias de PC).
+
+Desactivar el entorno virtual: 
+deactivate
+
+Cerrar la carpeta: 
+Ve a File > Close Folder en VS Code.

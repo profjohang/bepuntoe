@@ -15,8 +15,3 @@ Este proyecto es un MVP desarrollado con **FastAPI** que permite a los usuarios 
 3. Activar entorno: `venv\Scripts\activate`
 4. Instalar dependencias: `pip install -r requirements.txt`
 5. Ejecutar: `uvicorn main:app --reload`
-
-## 📋 Roadmap de mejoras
-- [ ] Migración a PostgreSQL.
-- [ ] Implementación de variables de entorno (.env).
-- [ ] Módulo de subida de archivos para prototipos.
