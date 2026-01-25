@@ -1,18 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* Estilos personalizados para mantener la coherencia con b.e */
+    .card-be-header {
+        background-color: var(--be-blue);
+        color: white;
+        font-weight: bold;
+    }
+    .btn-be-save {
+        background-color: var(--be-blue);
+        color: white;
+        border: none;
+        transition: background-color 0.3s;
+    }
+    .btn-be-save:hover {
+        background-color: var(--be-dark-blue);
+        color: white;
+    }
+    .guide-box {
+        background-color: #f0f2f9;
+        border-left: 4px solid var(--be-blue);
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+    }
+    .example-badge {
+        background-color: var(--be-dark-blue);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+    .nav-tabs .nav-link.active {
+        color: var(--be-blue) !important;
+        font-weight: bold;
+        border-bottom: 3px solid var(--be-blue) !important;
+    }
+</style>
+
 <div class="row mb-4">
     <div class="col">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/dashboard">Mis Proyectos</a></li>
+                <li class="breadcrumb-item"><a href="/dashboard" style="color: var(--be-blue);">Mis Proyectos</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Espacio de Trabajo</li>
             </ol>
         </nav>
-        <h2 id="projectTitleDisplay" class="fw-bold">Cargando proyecto...</h2>
+        <h2 id="projectTitleDisplay" class="fw-bold" style="color: var(--be-dark-blue);">Cargando proyecto...</h2>
     </div>
     <div class="col-auto">
-        <button onclick="saveProject()" class="btn btn-success">💾 Guardar Todo</button>
+        <button onclick="saveProject()" class="btn btn-be-save shadow-sm">💾 Guardar Todo</button>
         <a href="/project/summary/{{ project_id }}" class="btn btn-outline-dark">📋 Ver Resumen</a>
     </div>
 </div>
@@ -25,71 +64,90 @@
     <li class="nav-item"><button class="nav-link" id="fase5-tab" data-bs-toggle="tab" data-bs-target="#fase5" type="button">5. Testear</button></li>
 </ul>
 
-<div class="tab-content bg-white p-4 border border-top-0 rounded-bottom shadow-sm" id="myTabContent">
+<div class="tab-content border p-4 bg-white shadow-sm" id="myTabContent">
     
-    <div class="tab-pane fade show active" id="fase1">
-        <h4>🗺️ Mapa de Empatía</h4>
-        <p class="text-muted">Describe a tu usuario: ¿Qué piensa, siente, ve y escucha?</p>
-        <textarea id="input_phase1" class="form-control" rows="10" placeholder="Escribe aquí tus hallazgos de la fase de Empatía..."></textarea>
+    <div class="tab-pane fade show active" id="fase1" role="tabpanel">
+        <div class="mb-3">
+            <h4 style="color: var(--be-blue);" class="fw-bold">🔍 Fase 1: Empatizar</h4>
+            <div class="guide-box">
+                <p class="mb-2"><strong>Guía pedagógica:</strong> La innovación comienza con la empatía. Tu objetivo no es vender una idea, sino descubrir qué le duele a tu comunidad o cliente potencial.</p>
+                <p class="mb-0 small text-muted"><span class="example-badge">Ejemplo</span> "Los estudiantes desperdician comida porque las porciones son muy grandes para los niños de primaria."</p>
+            </div>
+            <label class="form-label fw-bold">Hallazgos de la observación:</label>
+            <textarea id="input_phase1" class="form-control" rows="8" placeholder="Escribe aquí qué viste y qué escuchaste..."></textarea>
+        </div>
     </div>
 
-    <div class="tab-pane fade" id="fase2">
-        <h4>🎯 Definición del Problema</h4>
-        <p class="text-muted">¿Cuál es el "Insight" o problema central que encontraste?</p>
-        <textarea id="input_phase2" class="form-control" rows="10" placeholder="El problema central es..."></textarea>
+    <div class="tab-pane fade" id="fase2" role="tabpanel">
+        <div class="mb-3">
+            <h4 style="color: var(--be-blue);" class="fw-bold">📍 Fase 2: Definir</h4>
+            <div class="guide-box">
+                <p class="mb-2"><strong>Guía pedagógica:</strong> ¡Hora de filtrar! Define el problema real usando la fórmula: <em>[Usuario] necesita [Necesidad] porque [Insight]</em>.</p>
+                <p class="mb-0 small text-muted"><span class="example-badge">Ejemplo</span> "Los niños de primaria necesitan porciones ajustadas porque se sienten culpables al botar sobras."</p>
+            </div>
+            <label class="form-label fw-bold">Declaración del problema (Insight):</label>
+            <textarea id="input_phase2" class="form-control" rows="8" placeholder="Define claramente el desafío que vas a resolver..."></textarea>
+        </div>
     </div>
 
-    <div class="tab-pane fade" id="fase3">
-        <h4>💡 Lluvia de Ideas</h4>
-        <p class="text-muted">Escribe todas las soluciones posibles (Brainstorming).</p>
-        <textarea id="input_phase3" class="form-control" rows="10" placeholder="- Idea 1: ... &#10;- Idea 2: ..."></textarea>
+    <div class="tab-pane fade" id="fase3" role="tabpanel">
+        <div class="mb-3">
+            <h4 style="color: var(--be-blue);" class="fw-bold">💡 Fase 3: Idear</h4>
+            <div class="guide-box">
+                <p class="mb-2"><strong>Guía pedagógica:</strong> ¡Creatividad sin límites! Lanza todas las soluciones posibles, por locas que parezcan. En la cantidad está el camino.</p>
+                <p class="mb-0 small text-muted"><span class="example-badge">Ejemplo</span> "1. Menú por colores. 2. Estación de intercambio de comida. 3. App de medición de desperdicio."</p>
+            </div>
+            <label class="form-label fw-bold">Lluvia de ideas:</label>
+            <textarea id="input_phase3" class="form-control" rows="8" placeholder="Escribe aquí todas las ideas que surgieron..."></textarea>
+        </div>
     </div>
 
-    <div class="tab-pane fade" id="fase4">
-        <h4>🛠️ Prototipo</h4>
-        <p class="text-muted">Describe cómo será tu prototipo inicial (Boceto, Maqueta, Wireframe).</p>
-        <textarea id="input_phase4" class="form-control" rows="10" placeholder="El prototipo consistirá en..."></textarea>
+    <div class="tab-pane fade" id="fase4" role="tabpanel">
+        <div class="mb-3">
+            <h4 style="color: var(--be-blue);" class="fw-bold">🔨 Fase 4: Prototipar</h4>
+            <div class="guide-box">
+                <p class="mb-2"><strong>Guía pedagógica:</strong> Haz tus ideas tangibles rápido y barato. El prototipo debe servir para que alguien lo vea y te dé su opinión.</p>
+                <p class="mb-0 small text-muted"><span class="example-badge">Ejemplo</span> "Dibujamos en hojas de papel cómo se vería la estación de intercambio y simulamos el proceso con platos de plástico."</p>
+            </div>
+            <label class="form-label fw-bold">Descripción de tu prototipo:</label>
+            <textarea id="input_phase4" class="form-control" rows="8" placeholder="¿Cómo construiste tu idea?"></textarea>
+        </div>
     </div>
 
-    <div class="tab-pane fade" id="fase5">
-        <h4>🧪 Resultados del Testeo</h4>
-        <p class="text-muted">¿Qué funcionó y qué no funcionó al probarlo con usuarios?</p>
-        <textarea id="input_phase5" class="form-control" rows="10" placeholder="Feedback recibido: ..."></textarea>
+    <div class="tab-pane fade" id="fase5" role="tabpanel">
+        <div class="mb-3">
+            <h4 style="color: var(--be-blue);" class="fw-bold">✅ Fase 5: Testear</h4>
+            <div class="guide-box">
+                <p class="mb-2"><strong>Guía pedagógica:</strong> Muestra tu prototipo a usuarios reales. Escucha las críticas. ¿Qué funcionó? ¿Qué mejorarías?</p>
+                <p class="mb-0 small text-muted"><span class="example-badge">Ejemplo</span> "Los niños dijeron que les gusta, pero que la estación debería estar cerca de la salida del comedor."</p>
+            </div>
+            <label class="form-label fw-bold">Resultados del Feedback:</label>
+            <textarea id="input_phase5" class="form-control" rows="8" placeholder="¿Qué aprendiste de los usuarios al mostrarles tu prototipo?"></textarea>
+        </div>
     </div>
 </div>
 
 <script>
-    // Obtenemos el ID del proyecto desde la URL (FastAPI nos lo pasó en la variable project_id)
     const projectId = "{{ project_id }}";
     const token = localStorage.getItem('token');
 
-    if (!token) window.location.href = '/login';
-
-    // 1. CARGAR DATOS AL ENTRAR
-    async function loadData() {
+    async function fetchProject() {
         try {
             const response = await fetch(`/projects/${projectId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
-            if(response.ok) {
+            if (response.ok) {
                 const data = await response.json();
-                // Ponemos el título en la cabecera
                 document.getElementById('projectTitleDisplay').innerText = data.title;
-                
-                // Rellenamos los campos de texto con lo que venga de la base de datos
                 document.getElementById('input_phase1').value = data.phase1_empatizar || "";
                 document.getElementById('input_phase2').value = data.phase2_definir || "";
                 document.getElementById('input_phase3').value = data.phase3_idear || "";
                 document.getElementById('input_phase4').value = data.phase4_prototipar || "";
                 document.getElementById('input_phase5').value = data.phase5_testear || "";
-            } else {
-                alert("Error cargando proyecto");
             }
         } catch (e) { console.error(e); }
     }
 
-    // 2. GUARDAR DATOS
     async function saveProject() {
         const payload = {
             phase1_empatizar: document.getElementById('input_phase1').value,
@@ -99,23 +157,24 @@
             phase5_testear: document.getElementById('input_phase5').value
         };
 
-        const response = await fetch(`/projects/${projectId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(payload)
-        });
+        try {
+            const response = await fetch(`/projects/${projectId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
 
-        if(response.ok) {
-            alert("✅ ¡Cambios guardados correctamente!");
-        } else {
-            alert("❌ Error al guardar.");
-        }
+            if(response.ok) {
+                alert("✅ Cambios guardados en b.e");
+            } else {
+                alert("❌ Error al guardar.");
+            }
+        } catch (error) { console.error(error); }
     }
 
-    // Iniciar carga
-    loadData();
+    fetchProject();
 </script>
 {% endblock %}

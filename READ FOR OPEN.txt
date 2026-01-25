@@ -7,6 +7,8 @@ Ve a File > Open Folder y selecciona tu carpeta proyecto_be.
 
 Abre una terminal nueva (Ctrl + Shift + ñ).
 
+Liberar los permisos de ejecución: Set-ExecutionPolicy Unrestricted -Scope Process
+
 Activa el venv: venv\Scripts\activate
 
 Lanza el servidor: uvicorn main:app --reload
