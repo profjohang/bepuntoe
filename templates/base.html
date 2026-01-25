@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>b.e - Emprendimiento Escolar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* PALETA DE COLORES b.e */
+        :root {
+            --be-blue: #32408C;
+            --be-dark-blue: #2E3959;
+            --be-white: #FFFFFF;
+            --be-black: #0A0A0D;
+        }
+
+        body { background-color: #f8f9fa; color: var(--be-black); }
+        
+        /* Navbar con el color principal */
+        .navbar { background-color: var(--be-blue) !important; }
+        
+        /* Botones con identidad b.e */
+        .btn-primary { 
+            background-color: var(--be-blue); 
+            border-color: var(--be-blue); 
+        }
+        .btn-primary:hover { 
+            background-color: var(--be-dark-blue); 
+            border-color: var(--be-dark-blue); 
+        }
+
+        .text-primary { color: var(--be-blue) !important; }
+        
+        /* Estilo del logo en el menú */
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="/dashboard">
+                <img src="/static/images/logo.png">
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="btnLogout" style="display:none;">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if(localStorage.getItem('token')) {
+            document.getElementById('btnLogout').style.display = 'block';
+        }
+        document.getElementById('btnLogout').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        });
+    </script>
+</body>
+</html>

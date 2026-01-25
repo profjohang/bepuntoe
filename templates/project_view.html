@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/dashboard">Mis Proyectos</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Espacio de Trabajo</li>
+            </ol>
+        </nav>
+        <h2 id="projectTitleDisplay" class="fw-bold">Cargando proyecto...</h2>
+    </div>
+    <div class="col-auto">
+        <button onclick="saveProject()" class="btn btn-success">💾 Guardar Todo</button>
+        <a href="/project/summary/{{ project_id }}" class="btn btn-outline-dark">📋 Ver Resumen</a>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+    <li class="nav-item"><button class="nav-link active" id="fase1-tab" data-bs-toggle="tab" data-bs-target="#fase1" type="button">1. Empatizar</button></li>
+    <li class="nav-item"><button class="nav-link" id="fase2-tab" data-bs-toggle="tab" data-bs-target="#fase2" type="button">2. Definir</button></li>
+    <li class="nav-item"><button class="nav-link" id="fase3-tab" data-bs-toggle="tab" data-bs-target="#fase3" type="button">3. Idear</button></li>
+    <li class="nav-item"><button class="nav-link" id="fase4-tab" data-bs-toggle="tab" data-bs-target="#fase4" type="button">4. Prototipar</button></li>
+    <li class="nav-item"><button class="nav-link" id="fase5-tab" data-bs-toggle="tab" data-bs-target="#fase5" type="button">5. Testear</button></li>
+</ul>
+
+<div class="tab-content bg-white p-4 border border-top-0 rounded-bottom shadow-sm" id="myTabContent">
+    
+    <div class="tab-pane fade show active" id="fase1">
+        <h4>🗺️ Mapa de Empatía</h4>
+        <p class="text-muted">Describe a tu usuario: ¿Qué piensa, siente, ve y escucha?</p>
+        <textarea id="input_phase1" class="form-control" rows="10" placeholder="Escribe aquí tus hallazgos de la fase de Empatía..."></textarea>
+    </div>
+
+    <div class="tab-pane fade" id="fase2">
+        <h4>🎯 Definición del Problema</h4>
+        <p class="text-muted">¿Cuál es el "Insight" o problema central que encontraste?</p>
+        <textarea id="input_phase2" class="form-control" rows="10" placeholder="El problema central es..."></textarea>
+    </div>
+
+    <div class="tab-pane fade" id="fase3">
+        <h4>💡 Lluvia de Ideas</h4>
+        <p class="text-muted">Escribe todas las soluciones posibles (Brainstorming).</p>
+        <textarea id="input_phase3" class="form-control" rows="10" placeholder="- Idea 1: ... &#10;- Idea 2: ..."></textarea>
+    </div>
+
+    <div class="tab-pane fade" id="fase4">
+        <h4>🛠️ Prototipo</h4>
+        <p class="text-muted">Describe cómo será tu prototipo inicial (Boceto, Maqueta, Wireframe).</p>
+        <textarea id="input_phase4" class="form-control" rows="10" placeholder="El prototipo consistirá en..."></textarea>
+    </div>
+
+    <div class="tab-pane fade" id="fase5">
+        <h4>🧪 Resultados del Testeo</h4>
+        <p class="text-muted">¿Qué funcionó y qué no funcionó al probarlo con usuarios?</p>
+        <textarea id="input_phase5" class="form-control" rows="10" placeholder="Feedback recibido: ..."></textarea>
+    </div>
+</div>
+
+<script>
+    // Obtenemos el ID del proyecto desde la URL (FastAPI nos lo pasó en la variable project_id)
+    const projectId = "{{ project_id }}";
+    const token = localStorage.getItem('token');
+
+    if (!token) window.location.href = '/login';
+
+    // 1. CARGAR DATOS AL ENTRAR
+    async function loadData() {
+        try {
+            const response = await fetch(`/projects/${projectId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if(response.ok) {
+                const data = await response.json();
+                // Ponemos el título en la cabecera
+                document.getElementById('projectTitleDisplay').innerText = data.title;
+                
+                // Rellenamos los campos de texto con lo que venga de la base de datos
+                document.getElementById('input_phase1').value = data.phase1_empatizar || "";
+                document.getElementById('input_phase2').value = data.phase2_definir || "";
+                document.getElementById('input_phase3').value = data.phase3_idear || "";
+                document.getElementById('input_phase4').value = data.phase4_prototipar || "";
+                document.getElementById('input_phase5').value = data.phase5_testear || "";
+            } else {
+                alert("Error cargando proyecto");
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    // 2. GUARDAR DATOS
+    async function saveProject() {
+        const payload = {
+            phase1_empatizar: document.getElementById('input_phase1').value,
+            phase2_definir: document.getElementById('input_phase2').value,
+            phase3_idear: document.getElementById('input_phase3').value,
+            phase4_prototipar: document.getElementById('input_phase4').value,
+            phase5_testear: document.getElementById('input_phase5').value
+        };
+
+        const response = await fetch(`/projects/${projectId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if(response.ok) {
+            alert("✅ ¡Cambios guardados correctamente!");
+        } else {
+            alert("❌ Error al guardar.");
+        }
+    }
+
+    // Iniciar carga
+    loadData();
+</script>
+{% endblock %}

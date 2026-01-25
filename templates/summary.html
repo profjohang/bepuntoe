@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Estilos para que el reporte se vea bien en pantalla e impreso */
+    .summary-card { border-left: 5px solid #e67e22; margin-bottom: 20px; }
+    
+    @media print {
+        .no-print { display: none !important; }
+        body { background-color: white !important; }
+        .card { 
+            border: 1px solid #ccc !important; 
+            box-shadow: none !important; 
+        }
+        .summary-card { border-left: 5px solid #e67e22 !important; }
+    }
+</style>
+
+<div class="row mb-4 no-print">
+    <div class="col">
+        <a href="/project/view/{{ project_id }}" class="btn btn-outline-secondary">&larr; Volver al editor</a>
+    </div>
+    <div class="col-auto">
+        <button onclick="window.print()" class="btn btn-dark">🖨️ Imprimir Reporte</button>
+    </div>
+</div>
+
+<div id="reportArea">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold display-5" id="sumTitle">Cargando Proyecto...</h1>
+        <p class="lead text-muted" id="sumDesc"></p>
+        <hr class="my-4" style="border-top: 3px solid #2c3e50; width: 50px; margin: auto;">
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card summary-card shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">1. Empatizar</h4>
+                    <p id="sumPhase1" style="white-space: pre-wrap;"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card summary-card shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">2. Definir</h4>
+                    <p id="sumPhase2" style="white-space: pre-wrap;"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card summary-card shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">3. Idear</h4>
+                    <p id="sumPhase3" style="white-space: pre-wrap;"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card summary-card shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">4. Prototipar</h4>
+                    <p id="sumPhase4" style="white-space: pre-wrap;"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card summary-card shadow-sm">
+                <div class="card-body">
+                    <h4 class="fw-bold text-primary">5. Testear</h4>
+                    <p id="sumPhase5" style="white-space: pre-wrap;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const projectId = "{{ project_id }}";
+    const token = localStorage.getItem('token');
+
+    async function fetchSummary() {
+        const response = await fetch(`/projects/${projectId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(response.ok) {
+            const data = await response.json();
+            document.getElementById('sumTitle').innerText = data.title;
+            document.getElementById('sumDesc').innerText = data.description;
+            document.getElementById('sumPhase1').innerText = data.phase1_empatizar || "Sin completar.";
+            document.getElementById('sumPhase2').innerText = data.phase2_definir || "Sin completar.";
+            document.getElementById('sumPhase3').innerText = data.phase3_idear || "Sin completar.";
+            document.getElementById('sumPhase4').innerText = data.phase4_prototipar || "Sin completar.";
+            document.getElementById('sumPhase5').innerText = data.phase5_testear || "Sin completar.";
+        }
+    }
+    fetchSummary();
+</script>
+{% endblock %}

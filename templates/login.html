@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center my-5">
+    <div class="col-sm-10 col-md-8 col-lg-5 col-xl-4">
+        
+        <div class="text-center mb-4">
+            <img src="/static/images/logo.png" alt="b.e logo" style="width: 100px; height: auto;">
+            <p class="text-muted">Emprendimiento y Design Thinking</p>
+        </div>
+
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-3">
+                <h4 class="text-center mb-4 fw-bold">Iniciar Sesión</h4>
+                
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-semibold">Usuario</label>
+                        <input type="text" class="form-control" id="username" required placeholder="Tu usuario">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label fw-semibold">Contraseña</label>
+                        <input type="password" class="form-control" id="password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-2 shadow-sm">
+                        Entrar a mi espacio
+                    </button>
+                </form>
+                
+                <div class="mt-4 text-center border-top pt-3">
+                    <p class="mb-0">¿Nuevo en el programa? <br>
+                        <a href="/register" class="fw-bold text-decoration-none" style="color: var(--be-blue);">Crea tu cuenta aquí</a>
+                    </p>
+                </div>
+                <div id="errorMsg" class="alert alert-danger mt-3" style="display:none; font-size: 0.9rem;"></div>
+            </div>
+        </div>
+        
+        <p class="text-center mt-4 text-muted small">© 2026 Proyecto b.e | @johan.guerrerom </p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('username', document.getElementById('username').value);
+        formData.append('password', document.getElementById('password').value);
+
+        try {
+            const response = await fetch('/token', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('token', data.access_token);
+                window.location.href = '/dashboard'; 
+            } else {
+                document.getElementById('errorMsg').innerText = "Usuario o contraseña incorrectos";
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+</script>
+{% endblock %}
