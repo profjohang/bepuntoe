@@ -1,9 +1,9 @@
 # schemas.py
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 # --- MOLDES PARA PROYECTOS ---
-# Esto valida los datos cuando creamos o leemos un proyecto
+
 class ProjectBase(BaseModel):
     title: str
     description: str
@@ -14,27 +14,27 @@ class ProjectCreate(ProjectBase):
 class ProjectUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    phase1_empatizar: Optional[str] = None
-    phase2_definir: Optional[str] = None
-    phase3_idear: Optional[str] = None
-    phase4_prototipar: Optional[str] = None
-    phase5_testear: Optional[str] = None
+    # Es vital que estas líneas existan:
+    phase1_empatizar: Optional[Dict[str, Any]] = None
+    phase2_definir: Optional[Dict[str, Any]] = None
+    phase3_idear: Optional[Dict[str, Any]] = None
+    phase4_prototipar: Optional[Dict[str, Any]] = None
+    phase5_testear: Optional[Dict[str, Any]] = None
 
 class Project(ProjectBase):
     id: int
     owner_id: int
-    # Las fases son opcionales al inicio (pueden estar vacías)
-    phase1_empatizar: Optional[str] = ""
-    phase2_definir: Optional[str] = ""
-    phase3_idear: Optional[str] = ""
-    phase4_prototipar: Optional[str] = ""
-    phase5_testear: Optional[str] = ""
+    # Definimos que la salida también será un diccionario
+    phase1_empatizar: Optional[Dict[str, Any]] = {}
+    phase2_definir: Optional[Dict[str, Any]] = {}
+    phase3_idear: Optional[Dict[str, Any]] = {}
+    phase4_prototipar: Optional[Dict[str, Any]] = {}
+    phase5_testear: Optional[Dict[str, Any]] = {}
 
     class Config:
         from_attributes = True
 
 # --- MOLDES PARA USUARIOS ---
-# Esto valida los datos del usuario
 class UserBase(BaseModel):
     username: str
 

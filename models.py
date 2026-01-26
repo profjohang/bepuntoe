@@ -1,5 +1,5 @@
 # models.py
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, JSON, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -8,13 +8,12 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True) # Nombre de usuario único
-    password = Column(String) # Aquí guardaremos la contraseña
+    username = Column(String, unique=True, index=True)
+    password = Column(String)
     
-    # Relación: Un usuario puede tener muchos proyectos
     projects = relationship("Project", back_populates="owner")
 
-# Tabla de Proyectos (Simplificada para el MVP)
+# Tabla de Proyectos
 class Project(Base):
     __tablename__ = "projects"
 
@@ -22,13 +21,15 @@ class Project(Base):
     title = Column(String, index=True)
     description = Column(String)
     
-    # Guardamos las respuestas de cada fase como texto largo en estas columnas.
-    phase1_empatizar = Column(Text, default="") 
-    phase2_definir = Column(Text, default="")
-    phase3_idear = Column(Text, default="")
-    phase4_prototipar = Column(Text, default="")
-    phase5_testear = Column(Text, default="")
+    # CAMBIO IMPORTANTE: Usamos JSON en lugar de Text
+    # default={} asegura que empiece como un objeto vacío y no como null
+    phase1_empatizar = Column(JSON, default={}) 
+    phase2_definir = Column(JSON, default={})
+    phase3_idear = Column(JSON, default={})
+    phase4_prototipar = Column(JSON, default={})
+    phase5_testear = Column(JSON, default={})
 
-    # Conexión con el usuario dueño del proyecto
     owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="projects")
+
+    

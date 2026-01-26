@@ -205,6 +205,7 @@ def project_summary_page(project_id: int, request: Request):
 # --- RUTAS (EDICIÓN DE PROYECTOS) ---
 
 # GUARDAR CAMBIOS EN UN PROYECTO (PUT)
+
 @app.put("/projects/{project_id}", response_model=schemas.Project)
 def update_project(
     project_id: int,
@@ -212,26 +213,49 @@ def update_project(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    # Buscar el proyecto
+    print(f"--> Intentando actualizar proyecto {project_id}") # DEBUG
+    print(f"--> Datos recibidos: {project_update.model_dump(exclude_unset=True)}") # DEBUG
+
+    # 1. Buscar el proyecto
     db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
     
-    # Verificar permisos
+    # 2. Verificar existencia y permisos
     if not db_project:
         raise HTTPException(status_code=404, detail="Proyecto no encontrado")
     if db_project.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="No autorizado")
 
-    # Actualizar solo los campos que enviemos (sin borrar los otros)
-    update_data = project_update.dict(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(db_project, key, value)
+    # 3. Actualizar datos (Usando model_dump para Pydantic V2)
+    try:
+        update_data = project_update.model_dump(exclude_unset=True)
+        
+        for key, value in update_data.items():
+            setattr(db_project, key, value)
 
-    db.add(db_project)
-    db.commit()
-    db.refresh(db_project)
-    return db_project
+        db.add(db_project)
+        db.commit()
+        db.refresh(db_project)
+        print("--> ¡Actualización exitosa en BD!") # DEBUG
+        return db_project
+        
+    except Exception as e:
+        print(f"--> ERROR CRÍTICO AL GUARDAR: {e}") # DEBUG IMPORTANTE
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al guardar: {str(e)}")
 
 # SERVIR LA PÁGINA DE TRABAJO (HTML)
 @app.get("/project/view/{project_id}", response_class=HTMLResponse)
-def project_workspace_page(project_id: int, request: Request):
-    return templates.TemplateResponse("project_view.html", {"request": request, "project_id": project_id})
+def project_workspace_page(project_id: int, request: Request, db: Session = Depends(get_db)):
+    # 1. Buscamos el proyecto en la base de datos usando el ID
+    project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    
+    # 2. Si no existe, lanzamos error 
+    if not project:
+        raise HTTPException(status_code=404, detail="Proyecto no encontrado")
+
+    # 3. ¡IMPORTANTE! Pasamos la variable 'project' a la plantilla
+    return templates.TemplateResponse("project_view.html", {
+        "request": request, 
+        "project_id": project_id, 
+        "project": project 
+    })

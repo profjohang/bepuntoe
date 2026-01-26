@@ -32,6 +32,7 @@
                         <a href="/register" class="fw-bold text-decoration-none" style="color: var(--be-blue);">Crea tu cuenta aquí</a>
                     </p>
                 </div>
+                
                 <div id="errorMsg" class="alert alert-danger mt-3" style="display:none; font-size: 0.9rem;"></div>
             </div>
         </div>
@@ -56,7 +57,12 @@
 
             if (response.ok) {
                 const data = await response.json();
-                localStorage.setItem('token', data.access_token);
+                
+                // --- CAMBIO CLAVE AQUÍ ---
+                // Guardamos como 'access_token' para que coincida con project_view.html
+                localStorage.setItem('access_token', data.access_token);
+                // -------------------------
+                
                 window.location.href = '/dashboard'; 
             } else {
                 document.getElementById('errorMsg').innerText = "Usuario o contraseña incorrectos";
@@ -64,6 +70,8 @@
             }
         } catch (error) {
             console.error('Error:', error);
+            document.getElementById('errorMsg').innerText = "Error de conexión con el servidor";
+            document.getElementById('errorMsg').style.display = 'block';
         }
     });
 </script>

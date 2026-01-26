@@ -1,180 +1,231 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    /* Estilos personalizados para mantener la coherencia con b.e */
-    .card-be-header {
-        background-color: var(--be-blue);
-        color: white;
-        font-weight: bold;
-    }
-    .btn-be-save {
-        background-color: var(--be-blue);
-        color: white;
-        border: none;
-        transition: background-color 0.3s;
-    }
-    .btn-be-save:hover {
-        background-color: var(--be-dark-blue);
-        color: white;
-    }
-    .guide-box {
-        background-color: #f0f2f9;
-        border-left: 4px solid var(--be-blue);
-        padding: 15px;
-        margin-bottom: 15px;
-        border-radius: 4px;
-    }
-    .example-badge {
-        background-color: var(--be-dark-blue);
-        color: white;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-    }
-    .nav-tabs .nav-link.active {
-        color: var(--be-blue) !important;
-        font-weight: bold;
-        border-bottom: 3px solid var(--be-blue) !important;
-    }
-</style>
-
 <div class="row mb-4">
-    <div class="col">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/dashboard" style="color: var(--be-blue);">Mis Proyectos</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Espacio de Trabajo</li>
-            </ol>
-        </nav>
-        <h2 id="projectTitleDisplay" class="fw-bold" style="color: var(--be-dark-blue);">Cargando proyecto...</h2>
+    <div class="col-md-8">
+        <h2><i class="fas fa-rocket me-2"></i>{{ project.title }}</h2>
+        <p class="text-muted">{{ project.description }}</p>
     </div>
-    <div class="col-auto">
-        <button onclick="saveProject()" class="btn btn-be-save shadow-sm">💾 Guardar Todo</button>
-        <a href="/project/summary/{{ project_id }}" class="btn btn-outline-dark">📋 Ver Resumen</a>
+    <div class="col-md-4 text-end">
+        <span class="badge bg-primary fs-6">Design Thinking: En Progreso</span>
     </div>
 </div>
 
-<ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
-    <li class="nav-item"><button class="nav-link active" id="fase1-tab" data-bs-toggle="tab" data-bs-target="#fase1" type="button">1. Empatizar</button></li>
-    <li class="nav-item"><button class="nav-link" id="fase2-tab" data-bs-toggle="tab" data-bs-target="#fase2" type="button">2. Definir</button></li>
-    <li class="nav-item"><button class="nav-link" id="fase3-tab" data-bs-toggle="tab" data-bs-target="#fase3" type="button">3. Idear</button></li>
-    <li class="nav-item"><button class="nav-link" id="fase4-tab" data-bs-toggle="tab" data-bs-target="#fase4" type="button">4. Prototipar</button></li>
-    <li class="nav-item"><button class="nav-link" id="fase5-tab" data-bs-toggle="tab" data-bs-target="#fase5" type="button">5. Testear</button></li>
+<ul class="nav nav-tabs mb-4" id="projectTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="p1-tab" data-bs-toggle="tab" data-bs-target="#phase1" type="button" role="tab">1. Empatizar</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="p2-tab" data-bs-toggle="tab" data-bs-target="#phase2" type="button" role="tab">2. Definir</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="p3-tab" data-bs-toggle="tab" data-bs-target="#phase3" type="button" role="tab">3. Idear</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="p4-tab" data-bs-toggle="tab" data-bs-target="#phase4" type="button" role="tab">4. Prototipar</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="p5-tab" data-bs-toggle="tab" data-bs-target="#phase5" type="button" role="tab">5. Testear</button>
+    </li>
 </ul>
 
-<div class="tab-content border p-4 bg-white shadow-sm" id="myTabContent">
-    
-    <div class="tab-pane fade show active" id="fase1" role="tabpanel">
-        <div class="mb-3">
-            <h4 style="color: var(--be-blue);" class="fw-bold">🔍 Fase 1: Empatizar</h4>
-            <div class="guide-box">
-                <p class="mb-2"><strong>Guía pedagógica:</strong> La innovación comienza con la empatía. Tu objetivo no es vender una idea, sino descubrir qué le duele a tu comunidad o cliente potencial.</p>
-                <p class="mb-0 small text-muted"><span class="example-badge">Ejemplo</span> "Los estudiantes desperdician comida porque las porciones son muy grandes para los niños de primaria."</p>
+<div class="tab-content" id="projectTabsContent">
+
+    <div class="tab-pane fade show active" id="phase1" role="tabpanel">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Mapa de Empatía</h4>
+                <p class="text-muted small mb-4">
+                    Observa a tu usuario y completa los 4 cuadrantes.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded h-100 border">
+                            <label class="form-label fw-bold"><i class="fas fa-brain me-2"></i>¿Qué Piensa?</label>
+                            <textarea class="form-control" id="p1_piensa" rows="4">{{ project.phase1_empatizar.get('piensa', '') if project.phase1_empatizar else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded h-100 border">
+                            <label class="form-label fw-bold"><i class="fas fa-heart me-2"></i>¿Qué Siente?</label>
+                            <textarea class="form-control" id="p1_siente" rows="4">{{ project.phase1_empatizar.get('siente', '') if project.phase1_empatizar else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded h-100 border">
+                            <label class="form-label fw-bold"><i class="fas fa-comment me-2"></i>¿Qué Dice?</label>
+                            <textarea class="form-control" id="p1_dice" rows="4">{{ project.phase1_empatizar.get('dice', '') if project.phase1_empatizar else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded h-100 border">
+                            <label class="form-label fw-bold"><i class="fas fa-walking me-2"></i>¿Qué Hace?</label>
+                            <textarea class="form-control" id="p1_hace" rows="4">{{ project.phase1_empatizar.get('hace', '') if project.phase1_empatizar else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <button class="btn btn-primary" onclick="savePhase(1)">
+                        <i class="fas fa-save me-2"></i>Guardar Empatía
+                    </button>
+                </div>
             </div>
-            <label class="form-label fw-bold">Hallazgos de la observación:</label>
-            <textarea id="input_phase1" class="form-control" rows="8" placeholder="Escribe aquí qué viste y qué escuchaste..."></textarea>
         </div>
     </div>
 
-    <div class="tab-pane fade" id="fase2" role="tabpanel">
-        <div class="mb-3">
-            <h4 style="color: var(--be-blue);" class="fw-bold">📍 Fase 2: Definir</h4>
-            <div class="guide-box">
-                <p class="mb-2"><strong>Guía pedagógica:</strong> ¡Hora de filtrar! Define el problema real usando la fórmula: <em>[Usuario] necesita [Necesidad] porque [Insight]</em>.</p>
-                <p class="mb-0 small text-muted"><span class="example-badge">Ejemplo</span> "Los niños de primaria necesitan porciones ajustadas porque se sienten culpables al botar sobras."</p>
+    <div class="tab-pane fade" id="phase2" role="tabpanel">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Definición del Problema (POV)</h4>
+                
+                <div class="alert alert-info border-info mb-4">
+                    <h5 class="alert-heading"><i class="fas fa-quote-left me-2"></i>Tu Declaración:</h5>
+                    <p class="mb-0 fs-5 text-dark">
+                        "El <strong id="show_usuario">{{ project.phase2_definir.get('usuario', 'USUARIO') if project.phase2_definir else 'USUARIO' }}</strong> 
+                        necesita <strong id="show_necesidad">{{ project.phase2_definir.get('necesidad', 'NECESIDAD') if project.phase2_definir else 'NECESIDAD' }}</strong> 
+                        porque <strong id="show_insight">{{ project.phase2_definir.get('insight', 'INSIGHT') if project.phase2_definir else 'INSIGHT' }}</strong>."
+                    </p>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded h-100 border text-center">
+                            <label class="form-label fw-bold">Usuario</label>
+                            <input type="text" class="form-control text-center" id="p2_usuario" 
+                                   value="{{ project.phase2_definir.get('usuario', '') if project.phase2_definir else '' }}"
+                                   oninput="updatePOV()">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded h-100 border text-center">
+                            <label class="form-label fw-bold">Necesidad</label>
+                            <input type="text" class="form-control text-center" id="p2_necesidad" 
+                                   value="{{ project.phase2_definir.get('necesidad', '') if project.phase2_definir else '' }}"
+                                   oninput="updatePOV()">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded h-100 border text-center">
+                            <label class="form-label fw-bold">Insight (Porque...)</label>
+                            <input type="text" class="form-control text-center" id="p2_insight" 
+                                   value="{{ project.phase2_definir.get('insight', '') if project.phase2_definir else '' }}"
+                                   oninput="updatePOV()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <button class="btn btn-primary" onclick="savePhase(2)">
+                        <i class="fas fa-save me-2"></i>Guardar Definición
+                    </button>
+                </div>
             </div>
-            <label class="form-label fw-bold">Declaración del problema (Insight):</label>
-            <textarea id="input_phase2" class="form-control" rows="8" placeholder="Define claramente el desafío que vas a resolver..."></textarea>
         </div>
     </div>
 
-    <div class="tab-pane fade" id="fase3" role="tabpanel">
-        <div class="mb-3">
-            <h4 style="color: var(--be-blue);" class="fw-bold">💡 Fase 3: Idear</h4>
-            <div class="guide-box">
-                <p class="mb-2"><strong>Guía pedagógica:</strong> ¡Creatividad sin límites! Lanza todas las soluciones posibles, por locas que parezcan. En la cantidad está el camino.</p>
-                <p class="mb-0 small text-muted"><span class="example-badge">Ejemplo</span> "1. Menú por colores. 2. Estación de intercambio de comida. 3. App de medición de desperdicio."</p>
-            </div>
-            <label class="form-label fw-bold">Lluvia de ideas:</label>
-            <textarea id="input_phase3" class="form-control" rows="8" placeholder="Escribe aquí todas las ideas que surgieron..."></textarea>
+    <div class="tab-pane fade" id="phase3" role="tabpanel">
+        <div class="card shadow-sm p-4">
+            <h4>Lluvia de Ideas</h4>
+            <textarea class="form-control mb-3" id="phase3_input" rows="6">{{ project.phase3_idear.get('texto', '') if project.phase3_idear else '' }}</textarea>
+            <button class="btn btn-primary" onclick="savePhase(3)">Guardar</button>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="phase4" role="tabpanel">
+        <div class="card shadow-sm p-4">
+            <h4>Prototipo</h4>
+            <textarea class="form-control mb-3" id="phase4_input" rows="6">{{ project.phase4_prototipar.get('texto', '') if project.phase4_prototipar else '' }}</textarea>
+            <button class="btn btn-primary" onclick="savePhase(4)">Guardar</button>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="phase5" role="tabpanel">
+        <div class="card shadow-sm p-4">
+            <h4>Testeo</h4>
+            <textarea class="form-control mb-3" id="phase5_input" rows="6">{{ project.phase5_testear.get('texto', '') if project.phase5_testear else '' }}</textarea>
+            <button class="btn btn-primary" onclick="savePhase(5)">Guardar</button>
         </div>
     </div>
 
-    <div class="tab-pane fade" id="fase4" role="tabpanel">
-        <div class="mb-3">
-            <h4 style="color: var(--be-blue);" class="fw-bold">🔨 Fase 4: Prototipar</h4>
-            <div class="guide-box">
-                <p class="mb-2"><strong>Guía pedagógica:</strong> Haz tus ideas tangibles rápido y barato. El prototipo debe servir para que alguien lo vea y te dé su opinión.</p>
-                <p class="mb-0 small text-muted"><span class="example-badge">Ejemplo</span> "Dibujamos en hojas de papel cómo se vería la estación de intercambio y simulamos el proceso con platos de plástico."</p>
-            </div>
-            <label class="form-label fw-bold">Descripción de tu prototipo:</label>
-            <textarea id="input_phase4" class="form-control" rows="8" placeholder="¿Cómo construiste tu idea?"></textarea>
-        </div>
-    </div>
-
-    <div class="tab-pane fade" id="fase5" role="tabpanel">
-        <div class="mb-3">
-            <h4 style="color: var(--be-blue);" class="fw-bold">✅ Fase 5: Testear</h4>
-            <div class="guide-box">
-                <p class="mb-2"><strong>Guía pedagógica:</strong> Muestra tu prototipo a usuarios reales. Escucha las críticas. ¿Qué funcionó? ¿Qué mejorarías?</p>
-                <p class="mb-0 small text-muted"><span class="example-badge">Ejemplo</span> "Los niños dijeron que les gusta, pero que la estación debería estar cerca de la salida del comedor."</p>
-            </div>
-            <label class="form-label fw-bold">Resultados del Feedback:</label>
-            <textarea id="input_phase5" class="form-control" rows="8" placeholder="¿Qué aprendiste de los usuarios al mostrarles tu prototipo?"></textarea>
-        </div>
-    </div>
 </div>
 
 <script>
-    const projectId = "{{ project_id }}";
-    const token = localStorage.getItem('token');
+    // Usamos comillas para evitar errores de sintaxis en el editor
+    const projectId = "{{ project.id }}";
 
-    async function fetchProject() {
+    function updatePOV() {
         try {
-            const response = await fetch(`/projects/${projectId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                document.getElementById('projectTitleDisplay').innerText = data.title;
-                document.getElementById('input_phase1').value = data.phase1_empatizar || "";
-                document.getElementById('input_phase2').value = data.phase2_definir || "";
-                document.getElementById('input_phase3').value = data.phase3_idear || "";
-                document.getElementById('input_phase4').value = data.phase4_prototipar || "";
-                document.getElementById('input_phase5').value = data.phase5_testear || "";
-            }
-        } catch (e) { console.error(e); }
+            document.getElementById('show_usuario').innerText = document.getElementById('p2_usuario').value || 'USUARIO';
+            document.getElementById('show_necesidad').innerText = document.getElementById('p2_necesidad').value || 'NECESIDAD';
+            document.getElementById('show_insight').innerText = document.getElementById('p2_insight').value || 'INSIGHT';
+        } catch(e) { console.log(e); }
     }
 
-    async function saveProject() {
-        const payload = {
-            phase1_empatizar: document.getElementById('input_phase1').value,
-            phase2_definir: document.getElementById('input_phase2').value,
-            phase3_idear: document.getElementById('input_phase3').value,
-            phase4_prototipar: document.getElementById('input_phase4').value,
-            phase5_testear: document.getElementById('input_phase5').value
-        };
+    async function savePhase(phaseNumber) {
+        // 1. OBTENER EL TOKEN (El carnet de acceso)
+        const token = localStorage.getItem("access_token");
+        
+        if (!token) {
+            alert("⚠️ No estás logueado. Por favor inicia sesión nuevamente.");
+            window.location.href = "/login";
+            return;
+        }
 
+        let data = {};
+        
         try {
+            // PREPARAR LOS DATOS (Igual que antes)
+            if (phaseNumber === 1) {
+                data = {
+                    phase1_empatizar: {
+                        piensa: document.getElementById('p1_piensa').value,
+                        siente: document.getElementById('p1_siente').value,
+                        dice: document.getElementById('p1_dice').value,
+                        hace: document.getElementById('p1_hace').value
+                    }
+                };
+            } else if (phaseNumber === 2) {
+                data = {
+                    phase2_definir: {
+                        usuario: document.getElementById('p2_usuario').value,
+                        necesidad: document.getElementById('p2_necesidad').value,
+                        insight: document.getElementById('p2_insight').value
+                    }
+                };
+            } else if (phaseNumber === 3) {
+                data = { phase3_idear: { texto: document.getElementById('phase3_input').value } };
+            } else if (phaseNumber === 4) {
+                data = { phase4_prototipar: { texto: document.getElementById('phase4_input').value } };
+            } else if (phaseNumber === 5) {
+                data = { phase5_testear: { texto: document.getElementById('phase5_input').value } };
+            }
+
+            // 2. ENVIAR AL SERVIDOR (Con el Token)
             const response = await fetch(`/projects/${projectId}`, {
                 method: 'PUT',
-                headers: {
+                headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`  // <--- ¡AQUÍ ESTÁ LA MAGIA!
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(data)
             });
 
-            if(response.ok) {
-                alert("✅ Cambios guardados en b.e");
+            if (response.ok) {
+                alert('✅ ¡Fase guardada exitosamente!');
             } else {
-                alert("❌ Error al guardar.");
+                // Si el token venció, nos dirá 401 de nuevo
+                if (response.status === 401) {
+                    alert('⏳ Tu sesión ha expirado. Inicia sesión de nuevo.');
+                    window.location.href = "/login";
+                } else {
+                    alert('❌ Error al guardar en el servidor.');
+                }
             }
-        } catch (error) { console.error(error); }
+        } catch (error) {
+            console.error(error);
+            alert('⚠️ Error de conexión.');
+        }
     }
-
-    fetchProject();
 </script>
+
 {% endblock %}
