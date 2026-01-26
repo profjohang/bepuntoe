@@ -13,14 +13,14 @@
     </div>
 </div>
 
-<div class="row" id="projectsContainer">
+<div class="row" id="projects-container">
     <div class="col-12 text-center mt-5">
         <div class="spinner-border text-primary" role="status"></div>
         <p>Cargando tus proyectos...</p>
     </div>
 </div>
 
-<div class="modal fade" id="createModal" tabindex="-1">
+<div class="modal fade" id="createProjectModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -31,11 +31,11 @@
                 <form id="createProjectForm">
                     <div class="mb-3">
                         <label class="form-label">Nombre del Proyecto</label>
-                        <input type="text" class="form-control" id="projectTitle" required placeholder="Ej: Venta de Postres Saludables">
+                        <input type="text" class="form-control" id="new_title" required placeholder="Ej: Venta de Postres Saludables">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Breve Descripción</label>
-                        <textarea class="form-control" id="projectDesc" rows="3" required placeholder="¿De qué trata tu idea?"></textarea>
+                        <textarea class="form-control" id="new_desc" rows="3" required placeholder="¿De qué trata tu idea?"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Crear Proyecto</button>
                 </form>
@@ -45,81 +45,84 @@
 </div>
 
 <script>
-    // 1. REVISAR SI HAY SESIÓN
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("access_token");
+
     if (!token) {
-        window.location.href = '/login'; // Si no hay token, mandar al login
+        window.location.href = "/login";
     }
 
-    // 2. FUNCIÓN PARA CARGAR PROYECTOS
     async function loadProjects() {
         try {
-            const response = await fetch('/projects/', {
+            const response = await fetch('/projects/', { 
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            if (response.ok) {
-                const projects = await response.json();
-                const container = document.getElementById('projectsContainer');
-                container.innerHTML = ''; // Limpiar cargando
+            if (response.status === 401) {
+                localStorage.removeItem("access_token");
+                window.location.href = "/login";
+                return;
+            }
 
-                if (projects.length === 0) {
-                    container.innerHTML = '<div class="col-12 text-center text-muted"><h4>No tienes proyectos aún. ¡Crea el primero! 🚀</h4></div>';
-                    return;
-                }
+            const projects = await response.json();
+            // Ahora este ID sí existe en el HTML de arriba
+            const container = document.getElementById('projects-container');
+            container.innerHTML = ''; 
 
-                // Dibujar una tarjeta por cada proyecto
-                projects.forEach(p => {
-                    const card = `
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100 shadow-sm border-0">
-                                <div class="card-body">
-                                    <h5 class="card-title fw-bold text-primary">${p.title}</h5>
-                                    <p class="card-text text-secondary">${p.description}</p>
-                                </div>
-                                <div class="card-footer bg-white border-0 text-end">
-                                    <a href="/project/view/${p.id}" class="btn btn-outline-primary btn-sm">Continuar Trabajando &rarr;</a>
-                                </div>
+            if (projects.length === 0) {
+                container.innerHTML = `<div class="col-12 text-center py-5"><h5 class="text-muted">Aún no tienes proyectos.</h5></div>`;
+                return;
+            }
+
+            projects.forEach(p => {
+                const html = `
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0 project-card">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-dark">${p.title}</h5>
+                            <p class="card-text text-muted small">${p.description}</p>
+                            <div class="mt-3">
+                                <a href="/project/view/${p.id}" class="btn btn-outline-primary w-100">Abrir Proyecto</a>
                             </div>
                         </div>
-                    `;
-                    container.innerHTML += card;
-                });
+                    </div>
+                </div>`;
+                container.innerHTML += html;
+            });
+
+        } catch (error) {
+            console.error("Error cargando proyectos:", error);
+        }
+    }
+
+    document.getElementById('createProjectForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('new_title').value;
+        const desc = document.getElementById('new_desc').value;
+
+        try {
+            const response = await fetch('/projects/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ title: title, description: desc })
+            });
+
+            if (response.ok) {
+                const modalElement = document.getElementById('createProjectModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                modal.hide();
+                loadProjects(); 
+                document.getElementById('createProjectForm').reset();
             } else {
-                alert("Tu sesión expiró. Ingresa nuevamente.");
-                window.location.href = '/login';
+                alert("Error al crear. Tu sesión podría haber expirado.");
             }
         } catch (error) {
             console.error(error);
         }
-    }
-
-    // 3. FUNCIÓN PARA CREAR NUEVO PROYECTO
-    document.getElementById('createProjectForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const title = document.getElementById('projectTitle').value;
-        const desc = document.getElementById('projectDesc').value;
-
-        const response = await fetch('/projects/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ title: title, description: desc })
-        });
-
-        if (response.ok) {
-            // Cerrar modal y recargar lista
-            bootstrap.Modal.getInstance(document.getElementById('createModal')).hide();
-            document.getElementById('createProjectForm').reset();
-            loadProjects(); 
-        } else {
-            alert("Error al crear el proyecto");
-        }
     });
 
-    // Cargar proyectos al abrir la página
     loadProjects();
 </script>
 {% endblock %}

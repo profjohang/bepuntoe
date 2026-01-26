@@ -57,12 +57,7 @@
 
             if (response.ok) {
                 const data = await response.json();
-                
-                // --- CAMBIO CLAVE AQUÍ ---
-                // Guardamos como 'access_token' para que coincida con project_view.html
                 localStorage.setItem('access_token', data.access_token);
-                // -------------------------
-                
                 window.location.href = '/dashboard'; 
             } else {
                 document.getElementById('errorMsg').innerText = "Usuario o contraseña incorrectos";
