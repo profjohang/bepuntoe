@@ -23,6 +23,8 @@ Guardar el progreso (Commit):
 git commit -m "Descripción de lo que hiciste" 
 (Ejemplo: git commit -m "UI: Ajuste de colores institucionales en b.e").
 
+git commit -m "feat: Ajustes de metodo para lograr register desde login, ajuste apariencia register" 
+
 Sincronizar con la nube (Push): 
 git push origin feature/mejoras-be
 
