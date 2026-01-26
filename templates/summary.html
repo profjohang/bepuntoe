@@ -2,74 +2,152 @@
 
 {% block content %}
 <style>
-    /* Estilos para que el reporte se vea bien en pantalla e impreso */
-    .summary-card { border-left: 5px solid #e67e22; margin-bottom: 20px; }
+    :root {
+        --be-blue: #32408C;
+        --be-dark-blue: #2E3959;
+    }
+
+    .summary-card { 
+        border-left: 5px solid var(--be-blue); 
+        margin-bottom: 25px; 
+        border-radius: 8px;
+    }
     
+    .phase-header {
+        color: var(--be-blue);
+        font-weight: bold;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        font-size: 1rem;
+    }
+
+    .data-label {
+        font-weight: bold;
+        color: var(--be-dark-blue);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        display: block;
+        margin-top: 10px;
+    }
+
+    .badge-idea {
+        background-color: #ffffff;
+        border: 1px solid var(--be-blue);
+        color: var(--be-blue);
+        margin: 4px;
+        padding: 6px 12px;
+        display: inline-block;
+        border-radius: 50px;
+        font-size: 0.85em;
+    }
+
+    .malla-cuadrante {
+        background-color: #fcfcfc;
+        border: 1px solid #eee;
+        padding: 15px;
+    }
+
     @media print {
         .no-print { display: none !important; }
-        body { background-color: white !important; }
-        .card { 
-            border: 1px solid #ccc !important; 
-            box-shadow: none !important; 
-        }
-        .summary-card { border-left: 5px solid #e67e22 !important; }
+        .card { border: 1px solid #eee !important; box-shadow: none !important; }
     }
 </style>
 
-<div class="row mb-4 no-print">
+<div class="row mb-4 no-print d-flex align-items-center">
     <div class="col">
-        <a href="/project/view/{{ project_id }}" class="btn btn-outline-secondary">&larr; Volver al editor</a>
+        <a href="/project/view/{{ project_id }}" class="btn btn-dark">
+            <i class="fas fa-arrow-left me-2"></i>Volver al Editor
+        </a>
     </div>
     <div class="col-auto">
-        <button onclick="window.print()" class="btn btn-dark">🖨️ Imprimir Reporte</button>
+        <button onclick="window.print()" class="btn btn-outline-dark">
+            <i class="fas fa-print me-2"></i>Imprimir Reporte
+        </button>
     </div>
 </div>
 
-<div id="reportArea">
+<div id="reportArea" class="container bg-white p-5 shadow rounded">
     <div class="text-center mb-5">
-        <h1 class="fw-bold display-5" id="sumTitle">Cargando Proyecto...</h1>
-        <p class="lead text-muted" id="sumDesc"></p>
-        <hr class="my-4" style="border-top: 3px solid #2c3e50; width: 50px; margin: auto;">
+        <h1 class="fw-bold display-6 mb-2" id="sumTitle" style="color: var(--be-dark-blue);">Cargando...</h1>
+        <p class="text-muted" id="sumDesc"></p>
+        <hr>
     </div>
 
     <div class="row g-4">
-        <div class="col-12">
-            <div class="card summary-card shadow-sm">
+        <div class="col-md-6">
+            <div class="card summary-card h-100 border-0 shadow-sm">
                 <div class="card-body">
-                    <h4 class="fw-bold text-primary">1. Empatizar</h4>
-                    <p id="sumPhase1" style="white-space: pre-wrap;"></p>
+                    <h5 class="phase-header">1. Empatizar (Mapa de Empatía)</h5>
+                    <div id="container_p1">
+                        <span class="data-label">¿Qué piensa?</span>
+                        <p id="sum_p1_piensa" class="small text-muted"></p>
+                        <span class="data-label">¿Qué siente?</span>
+                        <p id="sum_p1_siente" class="small text-muted"></p>
+                        <span class="data-label">¿Qué dice?</span>
+                        <p id="sum_p1_dice" class="small text-muted"></p>
+                        <span class="data-label">¿Qué hace?</span>
+                        <p id="sum_p1_hace" class="small text-muted"></p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-12">
-            <div class="card summary-card shadow-sm">
+
+        <div class="col-md-6">
+            <div class="card summary-card h-100 border-0 shadow-sm">
                 <div class="card-body">
-                    <h4 class="fw-bold text-primary">2. Definir</h4>
-                    <p id="sumPhase2" style="white-space: pre-wrap;"></p>
+                    <h5 class="phase-header">2. Definir (Punto de Vista)</h5>
+                    <div class="p-3 bg-light rounded">
+                        <p class="mb-1"><strong>Usuario:</strong> <span id="sum_p2_usuario"></span></p>
+                        <p class="mb-1"><strong>Necesidad:</strong> <span id="sum_p2_necesidad"></span></p>
+                        <p class="mb-0"><strong>Insight:</strong> <span id="sum_p2_insight"></span></p>
+                    </div>
                 </div>
             </div>
         </div>
+
         <div class="col-12">
-            <div class="card summary-card shadow-sm">
+            <div class="card summary-card border-0 shadow-sm">
                 <div class="card-body">
-                    <h4 class="fw-bold text-primary">3. Idear</h4>
-                    <p id="sumPhase3" style="white-space: pre-wrap;"></p>
+                    <h5 class="phase-header">3. Idear (Lluvia de Ideas)</h5>
+                    <div id="sumPhase3_container"></div>
                 </div>
             </div>
         </div>
+
         <div class="col-12">
-            <div class="card summary-card shadow-sm">
+            <div class="card summary-card border-0 shadow-sm">
                 <div class="card-body">
-                    <h4 class="fw-bold text-primary">4. Prototipar</h4>
-                    <p id="sumPhase4" style="white-space: pre-wrap;"></p>
+                    <h5 class="phase-header">4. Prototipar</h5>
+                    <p><strong>Idea base:</strong> <span id="sum_p4_base" class="text-primary fw-bold"></span></p>
+                    <p class="small text-muted" id="sum_p4_desc"></p>
                 </div>
             </div>
         </div>
+
         <div class="col-12">
-            <div class="card summary-card shadow-sm">
+            <div class="card summary-card border-0 shadow-sm">
                 <div class="card-body">
-                    <h4 class="fw-bold text-primary">5. Testear</h4>
-                    <p id="sumPhase5" style="white-space: pre-wrap;"></p>
+                    <h5 class="phase-header">5. Testear (Malla Receptora)</h5>
+                    <div class="row g-0 border rounded">
+                        <div class="col-6 malla-cuadrante border-end border-bottom">
+                            <small class="text-success fw-bold">INTERESANTE</small>
+                            <p id="sum_p5_int" class="small mb-0"></p>
+                        </div>
+                        <div class="col-6 malla-cuadrante border-bottom">
+                            <small class="text-danger fw-bold">CRÍTICAS</small>
+                            <p id="sum_p5_crit" class="small mb-0"></p>
+                        </div>
+                        <div class="col-6 malla-cuadrante border-end">
+                            <small class="text-info fw-bold">PREGUNTAS</small>
+                            <p id="sum_p5_preg" class="small mb-0"></p>
+                        </div>
+                        <div class="col-6 malla-cuadrante">
+                            <small class="text-warning fw-bold">NUEVAS IDEAS</small>
+                            <p id="sum_p5_new" class="small mb-0"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,23 +156,63 @@
 
 <script>
     const projectId = "{{ project_id }}";
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
 
     async function fetchSummary() {
-        const response = await fetch(`/projects/${projectId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if(response.ok) {
-            const data = await response.json();
-            document.getElementById('sumTitle').innerText = data.title;
-            document.getElementById('sumDesc').innerText = data.description;
-            document.getElementById('sumPhase1').innerText = data.phase1_empatizar || "Sin completar.";
-            document.getElementById('sumPhase2').innerText = data.phase2_definir || "Sin completar.";
-            document.getElementById('sumPhase3').innerText = data.phase3_idear || "Sin completar.";
-            document.getElementById('sumPhase4').innerText = data.phase4_prototipar || "Sin completar.";
-            document.getElementById('sumPhase5').innerText = data.phase5_testear || "Sin completar.";
-        }
+        try {
+            const response = await fetch(`/projects/${projectId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if(response.ok) {
+                const data = await response.json();
+                
+                document.getElementById('sumTitle').innerText = data.title;
+                document.getElementById('sumDesc').innerText = data.description;
+                
+                // Lógica Fase 1 (Mapa Empatía)
+                const p1 = data.phase1_empatizar || {};
+                document.getElementById('sum_p1_piensa').innerText = p1.piensa || "---";
+                document.getElementById('sum_p1_siente').innerText = p1.siente || "---";
+                document.getElementById('sum_p1_dice').innerText = p1.dice || "---";
+                document.getElementById('sum_p1_hace').innerText = p1.hace || "---";
+
+                // Lógica Fase 2 (POV)
+                const p2 = data.phase2_definir || {};
+                document.getElementById('sum_p2_usuario').innerText = p2.usuario || "---";
+                document.getElementById('sum_p2_necesidad').innerText = p2.necesidad || "---";
+                document.getElementById('sum_p2_insight').innerText = p2.insight || "---";
+
+                // Fase 3
+                const p3Container = document.getElementById('sumPhase3_container');
+                if (data.phase3_idear && data.phase3_idear.ideas) {
+                    data.phase3_idear.ideas.forEach(idea => {
+                        const span = document.createElement('span');
+                        span.className = 'badge-idea';
+                        span.innerText = idea;
+                        p3Container.appendChild(span);
+                    });
+                }
+
+                // Fase 4
+                const p4 = data.phase4_prototipar || {};
+                document.getElementById('sum_p4_base').innerText = p4.idea_base || "No seleccionada";
+                document.getElementById('sum_p4_desc').innerText = p4.descripcion || "Sin descripción";
+
+                // Fase 5
+                const p5 = data.phase5_testear || {};
+                document.getElementById('sum_p5_int').innerText = p5.interesante || "-";
+                document.getElementById('sum_p5_crit').innerText = p5.criticas || "-";
+                document.getElementById('sum_p5_preg').innerText = p5.preguntas || "-";
+                document.getElementById('sum_p5_new').innerText = p5.nuevas_ideas || "-";
+
+            } else {
+                alert("Error de sesión. Por favor ingresa de nuevo.");
+                window.location.href = "/login";
+            }
+        } catch (e) { console.error(e); }
     }
+    
     fetchSummary();
 </script>
 {% endblock %}

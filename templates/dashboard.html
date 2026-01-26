@@ -7,7 +7,7 @@
         <p class="text-muted">Gestiona tus ideas de emprendimiento</p>
     </div>
     <div class="col-auto">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
             + Nuevo Proyecto
         </button>
     </div>
@@ -64,6 +64,7 @@
             }
 
             const projects = await response.json();
+            
             // Ahora este ID sí existe en el HTML de arriba
             const container = document.getElementById('projects-container');
             container.innerHTML = ''; 
@@ -95,33 +96,37 @@
     }
 
     document.getElementById('createProjectForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const title = document.getElementById('new_title').value;
-        const desc = document.getElementById('new_desc').value;
+    e.preventDefault();
+    const title = document.getElementById('new_title').value;
+    const desc = document.getElementById('new_desc').value;
 
-        try {
-            const response = await fetch('/projects/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ title: title, description: desc })
-            });
+    try {
+        const response = await fetch('/projects/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ title: title, description: desc })
+        });
 
-            if (response.ok) {
-                const modalElement = document.getElementById('createProjectModal');
-                const modal = bootstrap.Modal.getInstance(modalElement);
-                modal.hide();
-                loadProjects(); 
-                document.getElementById('createProjectForm').reset();
-            } else {
-                alert("Error al crear. Tu sesión podría haber expirado.");
-            }
-        } catch (error) {
-            console.error(error);
+        if (response.ok) {
+            // Buscamos el modal por su ID correcto
+            const modalElement = document.getElementById('createProjectModal');
+            
+            // Intentamos obtener la instancia activa o creamos una nueva para poder cerrarlo
+            const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+            
+            modal.hide(); // Cerramos la ventana
+            loadProjects(); // Recargamos la lista de proyectos
+            document.getElementById('createProjectForm').reset(); // Limpiamos los campos
+        } else {
+            alert("Error al crear. Tu sesión podría haber expirado.");
         }
-    });
+    } catch (error) {
+        console.error("Error en la petición:", error);
+    }
+});    
 
     loadProjects();
 </script>

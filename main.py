@@ -198,7 +198,7 @@ def register_page(request: Request):
 def dashboard_page(request: Request):
     return templates.TemplateResponse("dashboard.html", {"request": request})
 
-@app.get("/project/summary/{project_id}", response_class=HTMLResponse)
+@app.get("/project/summary/{project_id}", response_class=HTMLResponse, name="project_summary")
 def project_summary_page(project_id: int, request: Request):
     return templates.TemplateResponse("summary.html", {"request": request, "project_id": project_id})
 
