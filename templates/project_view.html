@@ -4,9 +4,9 @@
 
 {% set p1 = 20 if project.phase1_empatizar and (project.phase1_empatizar.values()|join|length > 0) else 0 %}
     {% set p2 = 20 if project.phase2_definir and (project.phase2_definir.values()|join|length > 0) else 0 %}
-    {% set p3 = 20 if project.phase3_idear and project.phase3_idear.get('texto') else 0 %}
-    {% set p4 = 20 if project.phase4_prototipar and project.phase4_prototipar.get('texto') else 0 %}
-    {% set p5 = 20 if project.phase5_testear and project.phase5_testear.get('texto') else 0 %}
+    {% set p3 = 20 if project.phase3_idear and project.phase3_idear.get('ideas')|length > 0 else 0 %}
+    {% set p4 = 20 if project.phase4_prototipar and project.phase4_prototipar.get('descripcion') else 0 %}
+    {% set p5 = 20 if project.phase5_testear and (project.phase5_testear.get('interesante') or project.phase5_testear.get('criticas')) else 0 %}
     
     {% set total_progress = p1 + p2 + p3 + p4 + p5 %}
 
@@ -147,27 +147,124 @@
     </div>
 
     <div class="tab-pane fade" id="phase3" role="tabpanel">
-        <div class="card shadow-sm p-4">
-            <h4>Lluvia de Ideas</h4>
-            <textarea class="form-control mb-3" id="phase3_input" rows="6">{{ project.phase3_idear.get('texto', '') if project.phase3_idear else '' }}</textarea>
-            <button class="btn btn-primary" onclick="savePhase(3)">Guardar</button>
-        </div>
-    </div>
-    <div class="tab-pane fade" id="phase4" role="tabpanel">
-        <div class="card shadow-sm p-4">
-            <h4>Prototipo</h4>
-            <textarea class="form-control mb-3" id="phase4_input" rows="6">{{ project.phase4_prototipar.get('texto', '') if project.phase4_prototipar else '' }}</textarea>
-            <button class="btn btn-primary" onclick="savePhase(4)">Guardar</button>
-        </div>
-    </div>
-    <div class="tab-pane fade" id="phase5" role="tabpanel">
-        <div class="card shadow-sm p-4">
-            <h4>Testeo</h4>
-            <textarea class="form-control mb-3" id="phase5_input" rows="6">{{ project.phase5_testear.get('texto', '') if project.phase5_testear else '' }}</textarea>
-            <button class="btn btn-primary" onclick="savePhase(5)">Guardar</button>
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Brainstorming Digital</h4>
+                <p class="text-muted small mb-4">Genera múltiples soluciones. ¡No te limites, toda idea es válida!</p>
+                
+                <div class="input-group mb-4">
+                    <input type="text" id="nueva_idea_input" class="form-control" placeholder="Escribe una idea aquí...">
+                    <button class="btn btn-success" type="button" onclick="agregarIdea()">
+                        <i class="fas fa-plus me-2"></i>Añadir Idea
+                    </button>
+                </div>
+
+                <div id="contenedor_ideas" class="row g-3">
+                    {% if project.phase3_idear and project.phase3_idear.get('ideas') %}
+                        {% for idea in project.phase3_idear.get('ideas') %}
+                        <div class="col-md-4 idea-card" data-texto="{{ idea }}">
+                            <div class="p-3 bg-warning text-dark rounded shadow-sm h-100 position-relative border">
+                                {{ idea }}
+                                <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="this.closest('.idea-card').remove()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="mt-4 text-end">
+                    <button class="btn btn-primary" onclick="savePhase(3)">
+                        <i class="fas fa-save me-2"></i>Guardar Lluvia de Ideas
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
+    <div class="tab-pane fade" id="phase4" role="tabpanel">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Prototipar la Solución</h4>
+                <p class="text-muted small mb-4">Selecciona la mejor idea de tu lluvia de ideas y descríbela a detalle.</p>
+
+                <div class="row g-4">
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">1. Selecciona la idea a prototipar:</label>
+                        <select id="p4_idea_seleccionada" class="form-select mb-3">
+                            <option value="">-- Elige una idea --</option>
+                            {% if project.phase3_idear and project.phase3_idear.get('ideas') %}
+                                {% for idea in project.phase3_idear.get('ideas') %}
+                                    <option value="{{ idea }}" 
+                                        {% if project.phase4_prototipar and project.phase4_prototipar.get('idea_base') == idea %}selected{% endif %}>
+                                        {{ idea }}
+                                    </option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                        <div class="alert alert-light border small">
+                            <i class="fas fa-info-circle me-2"></i> Un prototipo es una representación rápida de tu idea para que otros puedan entenderla.
+                        </div>
+                    </div>
+
+                    <div class="col-md-7">
+                        <label class="form-label fw-bold">2. Descripción detallada del prototipo:</label>
+                        <textarea class="form-control" id="p4_descripcion" rows="6" 
+                            placeholder="¿Cómo funciona? ¿Qué materiales usa? ¿Cómo interactúa el usuario con él?">{{ project.phase4_prototipar.get('descripcion', '') if project.phase4_prototipar else '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <button class="btn btn-primary" onclick="savePhase(4)">
+                        <i class="fas fa-save me-2"></i>Guardar Prototipo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="phase5" role="tabpanel">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Testear: Malla Receptora de Información</h4>
+                <p class="text-muted small mb-4">Presenta tu prototipo a posibles usuarios y organiza sus comentarios aquí.</p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light">
+                            <label class="form-label fw-bold text-success"><i class="fas fa-plus-circle me-2"></i>¿Qué es lo más interesante?</label>
+                            <textarea class="form-control" id="p5_interesante" rows="3">{{ project.phase5_testear.get('interesante', '') if project.phase5_testear else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light">
+                            <label class="form-label fw-bold text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Críticas Constructivas</label>
+                            <textarea class="form-control" id="p5_criticas" rows="3">{{ project.phase5_testear.get('criticas', '') if project.phase5_testear else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light">
+                            <label class="form-label fw-bold text-info"><i class="fas fa-question-circle me-2"></i>Preguntas o Dudas</label>
+                            <textarea class="form-control" id="p5_preguntas" rows="3">{{ project.phase5_testear.get('preguntas', '') if project.phase5_testear else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light">
+                            <label class="form-label fw-bold text-warning"><i class="fas fa-lightbulb me-2"></i>Nuevas Ideas Surgidas</label>
+                            <textarea class="form-control" id="p5_nuevas_ideas" rows="3">{{ project.phase5_testear.get('nuevas_ideas', '') if project.phase5_testear else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <button class="btn btn-primary" onclick="savePhase(5)">
+                        <i class="fas fa-save me-2"></i>Guardar Evaluación
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -188,8 +285,31 @@
         } catch(e) { console.log(e); }
     }
 
+    // Función para añadir la tarjeta al tablero (solo visual)
+    function agregarIdea() {
+        const input = document.getElementById('nueva_idea_input');
+        const texto = input.value.trim();
+        
+        if (texto === "") return;
+
+        const contenedor = document.getElementById('contenedor_ideas');
+        const nuevaTarjeta = `
+            <div class="col-md-4 idea-card" data-texto="${texto}">
+                <div class="p-3 bg-warning text-dark rounded shadow-sm h-100 position-relative border" style="min-height: 100px; cursor: pointer;">
+                    ${texto}
+                    <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="this.closest('.idea-card').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        contenedor.insertAdjacentHTML('beforeend', nuevaTarjeta);
+        input.value = ""; // Limpiar input
+    }
+
     async function savePhase(phaseNumber) {
-        // 1. OBTENER EL TOKEN (El carnet de acceso)
+        // 1. OBTENER EL TOKEN 
         const token = localStorage.getItem("access_token");
         
         if (!token) {
@@ -201,7 +321,7 @@
         let data = {};
         
         try {
-            // PREPARAR LOS DATOS (Igual que antes)
+            // PREPARAR LOS DATOS
             if (phaseNumber === 1) {
                 data = {
                     phase1_empatizar: {
@@ -211,7 +331,8 @@
                         hace: document.getElementById('p1_hace').value
                     }
                 };
-            } else if (phaseNumber === 2) {
+            } 
+            else if (phaseNumber === 2) {
                 data = {
                     phase2_definir: {
                         usuario: document.getElementById('p2_usuario').value,
@@ -219,12 +340,58 @@
                         insight: document.getElementById('p2_insight').value
                     }
                 };
-            } else if (phaseNumber === 3) {
-                data = { phase3_idear: { texto: document.getElementById('phase3_input').value } };
-            } else if (phaseNumber === 4) {
-                data = { phase4_prototipar: { texto: document.getElementById('phase4_input').value } };
-            } else if (phaseNumber === 5) {
-                data = { phase5_testear: { texto: document.getElementById('phase5_input').value } };
+            }   
+            else if (phaseNumber === 3) {
+                const tarjetas = document.querySelectorAll('.idea-card');
+                const listaIdeas = Array.from(tarjetas).map(t => t.getAttribute('data-texto'));
+                
+                if (listaIdeas.length === 0) {
+                    alert("Agrega al menos una idea antes de guardar.");
+                    return;
+                }
+
+                data = { 
+                    phase3_idear: { 
+                        ideas: listaIdeas 
+                    } 
+                };
+            }
+            else if (phaseNumber === 4) {
+                const ideaBase = document.getElementById('p4_idea_seleccionada').value;
+                const descripcion = document.getElementById('p4_descripcion').value;
+
+                if (!ideaBase) {
+                    alert("⚠️ Debes seleccionar una idea de la fase anterior.");
+                    return;
+                }
+
+                if (descripcion.length < 10) {
+                    alert("⚠️ Por favor, brinda una descripción más detallada de tu prototipo.");
+                    return;
+                }
+
+                data = { 
+                    phase4_prototipar: { 
+                        idea_base: ideaBase,
+                        descripcion: descripcion 
+                    } 
+                };
+            }
+            else if (phaseNumber === 5) {
+                data = { 
+                    phase5_testear: { 
+                        interesante: document.getElementById('p5_interesante').value,
+                        criticas: document.getElementById('p5_criticas').value,
+                        preguntas: document.getElementById('p5_preguntas').value,
+                        nuevas_ideas: document.getElementById('p5_nuevas_ideas').value
+                    } 
+                };
+                
+                // Validación mínima 
+                if (!data.phase5_testear.interesante && !data.phase5_testear.criticas) {
+                    alert("⚠️ Por favor, completa al menos los puntos interesantes o críticas para validar tu idea.");
+                    return;
+                }
             }
 
             // 2. ENVIAR AL SERVIDOR (Con el Token)
