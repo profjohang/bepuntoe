@@ -14,30 +14,51 @@
 </div>
 
 <div class="row" id="projects-container">
-    <div class="col-12 text-center mt-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p>Cargando tus proyectos...</p>
     </div>
-</div>
 
 <div class="modal fade" id="createProjectModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Comenzar una nueva idea</h5>
+                <h5 class="modal-title">Nueva Idea</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="createProjectForm">
                     <div class="mb-3">
-                        <label class="form-label">Nombre del Proyecto</label>
-                        <input type="text" class="form-control" id="new_title" required placeholder="Ej: Venta de Postres Saludables">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="new_title" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Breve Descripción</label>
-                        <textarea class="form-control" id="new_desc" rows="3" required placeholder="¿De qué trata tu idea?"></textarea>
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" id="new_desc" rows="3" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Crear Proyecto</button>
+                    <button type="submit" class="btn btn-primary w-100">Crear</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editProjectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Proyecto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProjectForm">
+                    <input type="hidden" id="edit_project_id">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="edit_title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" id="edit_desc" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Guardar Cambios</button>
                 </form>
             </div>
         </div>
@@ -46,88 +67,87 @@
 
 <script>
     const token = localStorage.getItem("access_token");
-
-    if (!token) {
-        window.location.href = "/login";
-    }
+    if (!token) window.location.href = "/login";
 
     async function loadProjects() {
-        try {
-            const response = await fetch('/projects/', { 
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+        const response = await fetch('/projects/', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (response.status === 401) window.location.href = "/login";
+        
+        const projects = await response.json();
+        const container = document.getElementById('projects-container');
+        container.innerHTML = '';
 
-            if (response.status === 401) {
-                localStorage.removeItem("access_token");
-                window.location.href = "/login";
-                return;
-            }
-
-            const projects = await response.json();
-            
-            // Ahora este ID sí existe en el HTML de arriba
-            const container = document.getElementById('projects-container');
-            container.innerHTML = ''; 
-
-            if (projects.length === 0) {
-                container.innerHTML = `<div class="col-12 text-center py-5"><h5 class="text-muted">Aún no tienes proyectos.</h5></div>`;
-                return;
-            }
-
-            projects.forEach(p => {
-                const html = `
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm border-0 project-card">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold text-dark">${p.title}</h5>
-                            <p class="card-text text-muted small">${p.description}</p>
-                            <div class="mt-3">
-                                <a href="/project/view/${p.id}" class="btn btn-outline-primary w-100">Abrir Proyecto</a>
-                            </div>
+        projects.forEach(p => {
+        container.innerHTML += `
+        <div class="col-md-4 mb-4" id="project-card-${p.id}">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="fw-bold">${p.title}</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-link text-muted" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="openEditModal(${p.id}, '${p.title}', '${p.description}')">
+                                        <i class="fas fa-edit me-2"></i>Editar
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#" onclick="deleteProject(${p.id}, '${p.title}')">
+                                        <i class="fas fa-trash me-2"></i>Eliminar
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                </div>`;
-                container.innerHTML += html;
-            });
+                    <p class="text-muted small">${p.description}</p>
+                    <div class="mt-3">
+                        <a href="/project/view/${p.id}" class="btn btn-outline-primary btn-sm w-100">Abrir</a>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        });
+    }
 
-        } catch (error) {
-            console.error("Error cargando proyectos:", error);
+    function openEditModal(id, title, desc) {
+        document.getElementById('edit_project_id').value = id;
+        document.getElementById('edit_title').value = title;
+        document.getElementById('edit_desc').value = desc;
+        new bootstrap.Modal(document.getElementById('editProjectModal')).show();
+    }
+
+    document.getElementById('editProjectForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('edit_project_id').value;
+        const res = await fetch(`/projects/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ title: document.getElementById('edit_title').value, description: document.getElementById('edit_desc').value })
+        });
+        if (res.ok) location.reload();
+    });
+
+    async function deleteProject(id, title) {
+        if (confirm(`¿Borrar "${title}"?`) && confirm("¿Confirmas la eliminación definitiva?")) {
+            const res = await fetch(`/projects/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            if (res.ok) document.getElementById(`project-card-${id}`).remove();
         }
     }
 
     document.getElementById('createProjectForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const title = document.getElementById('new_title').value;
-    const desc = document.getElementById('new_desc').value;
-
-    try {
-        const response = await fetch('/projects/', {
+        e.preventDefault();
+        const res = await fetch('/projects/', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ title: title, description: desc })
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ title: document.getElementById('new_title').value, description: document.getElementById('new_desc').value })
         });
-
-        if (response.ok) {
-            // Buscamos el modal por su ID correcto
-            const modalElement = document.getElementById('createProjectModal');
-            
-            // Intentamos obtener la instancia activa o creamos una nueva para poder cerrarlo
-            const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-            
-            modal.hide(); // Cerramos la ventana
-            loadProjects(); // Recargamos la lista de proyectos
-            document.getElementById('createProjectForm').reset(); // Limpiamos los campos
-        } else {
-            alert("Error al crear. Tu sesión podría haber expirado.");
-        }
-    } catch (error) {
-        console.error("Error en la petición:", error);
-    }
-});    
+        if (res.ok) location.reload();
+    });
 
     loadProjects();
 </script>
 {% endblock %}
+

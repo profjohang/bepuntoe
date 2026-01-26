@@ -20,16 +20,18 @@ git add .
 (Esto le dice a Git: "Toma todos mis cambios y ponlos en la sala de espera").
 
 Guardar el progreso (Commit): 
-git commit -m "UI: Descripción de lo que hiciste" 
+git commit -m "Descripción de lo que hiciste" 
 (Ejemplo: git commit -m "UI: Ajuste de colores institucionales en b.e").
 
 Sincronizar con la nube (Push): 
 git push origin feature/complemento-de-contenido-pedagogico (Esto sube tu rama de trabajo a GitHub).
 
-Tip extra
-Antes de cerrar el VS Code hoy, verifica que tu git status te devuelva el mensaje: 
-"nothing to commit, working tree clean". 
-Eso significa que tu código está 100% a salvo tanto en tu PC como en la nube.
+Confirmar que el árbol de trabajo está limpio ("working tree clean")
+git status
+
+Crear una nueva rama
+git checkout -b feature/"nombre de la rama"
+git checkout -b feature/mejoras-be
 
 Detener el servidor: Presiona
 Ctrl + C en la terminal. 
@@ -44,3 +46,4 @@ deactivate
 
 Cerrar la carpeta: 
 Ve a File > Close Folder en VS Code.
+
