@@ -106,6 +106,31 @@ def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depen
         raise HTTPException(status_code=401, detail="Incorrecto")
     return {"access_token": create_access_token(data={"sub": user.username}), "token_type": "bearer"}
 
+@app.put("/users/me/profile")
+def update_user_profile(
+    user_update: schemas.UserUpdate, 
+    db: Session = Depends(get_db), 
+    current_user: models.User = Depends(get_current_user)
+):
+    if user_update.full_name is not None:
+        current_user.full_name = user_update.full_name
+    if user_update.age is not None:
+        current_user.age = user_update.age
+    if user_update.school is not None:
+        current_user.school = user_update.school
+    if user_update.grade is not None:
+        current_user.grade = user_update.grade
+    
+    db.commit() # Guardamos en MySQL
+    db.refresh(current_user)
+    
+    return {"message": "Perfil actualizado correctamente", "user": current_user.username}
+
+# --- NUEVA RUTA: Obtener datos del perfil ---
+@app.get("/users/me", response_model=schemas.User)
+def read_users_me(current_user: models.User = Depends(get_current_user)):
+    return current_user
+
 # PROYECTOS
 @app.post("/projects/", response_model=schemas.Project)
 def create_project(project: schemas.ProjectCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):

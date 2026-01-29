@@ -1,6 +1,59 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-1 text-primary">Hola, <span id="display_name">Cargando...</span> 👋</h4>
+            <p class="text-muted mb-0">
+                <i class="fas fa-school me-1"></i> <span id="display_school">...</span> | 
+                <i class="fas fa-graduation-cap me-1"></i> <span id="display_grade">...</span>
+            </p>
+        </div>
+        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <i class="fas fa-pen"></i> Editar Perfil
+        </button>
+    </div>
+</div>
+
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar mis datos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-control" id="edit_fullname">
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Edad</label>
+                            <input type="number" class="form-control" id="edit_age">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Grado / Curso</label>
+                            <input type="text" class="form-control" id="edit_grade">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Colegio</label>
+                        <input type="text" class="form-control" id="edit_school">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveProfile()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mb-4 align-items-center">
     <div class="col">
         <h2 class="fw-bold text-dark">Mis Proyectos</h2>
@@ -68,6 +121,66 @@
 <script>
     const token = localStorage.getItem("access_token");
     if (!token) window.location.href = "/login";
+
+    async function loadUserProfile() {
+        const token = localStorage.getItem("access_token");
+        if (!token) return; 
+
+        try {
+            const response = await fetch("/users/me", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            
+            if (response.ok) {
+                const user = await response.json();
+                
+                // A. Rellenar la Tarjeta Principal
+                document.getElementById("display_name").innerText = user.full_name || user.username;
+                document.getElementById("display_school").innerText = user.school || "Sin colegio";
+                document.getElementById("display_grade").innerText = user.grade || "Sin grado";
+
+                // B. Rellenar el Formulario del Modal (para que cuando edites, ya tenga tus datos)
+                document.getElementById("edit_fullname").value = user.full_name || "";
+                document.getElementById("edit_age").value = user.age || "";
+                document.getElementById("edit_school").value = user.school || "";
+                document.getElementById("edit_grade").value = user.grade || "";
+            }
+        } catch (error) {
+            console.error("Error cargando perfil:", error);
+        }
+    }
+
+    async function saveProfile() {
+    const token = localStorage.getItem("access_token");
+    
+    const data = {
+        full_name: document.getElementById('edit_fullname').value,
+        age: document.getElementById('edit_age').value,
+        school: document.getElementById('edit_school').value,
+        grade: document.getElementById('edit_grade').value
+    };
+
+    try {
+        const response = await fetch("/users/me/profile", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            alert("✅ Perfil actualizado con éxito");
+            location.reload(); // Recargamos para ver los cambios
+        } else {
+            alert("❌ Hubo un error al actualizar.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("⚠️ Error de conexión.");
+    }
+    }
 
     async function loadProjects() {
         const response = await fetch('/projects/', { headers: { 'Authorization': `Bearer ${token}` } });
@@ -159,7 +272,11 @@
         document.getElementById('btnLogout').style.display = 'block';
     }
     
-    loadProjects();
+    document.addEventListener("DOMContentLoaded", function() {
+            loadUserProfile();  // Carga los datos del estudiante 
+            loadProjects();     // Carga las tarjetas de los proyectos
+        });
+
 </script>
 {% endblock %}
 

@@ -14,7 +14,6 @@ class ProjectCreate(ProjectBase):
 class ProjectUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    # Es vital que estas líneas existan:
     phase1_empatizar: Optional[Dict[str, Any]] = None
     phase2_definir: Optional[Dict[str, Any]] = None
     phase3_idear: Optional[Dict[str, Any]] = None
@@ -34,6 +33,7 @@ class Project(ProjectBase):
         from_attributes = True
 
 # --- MOLDES PARA USUARIOS ---
+
 class UserBase(BaseModel):
     username: str
     full_name: str
@@ -43,6 +43,12 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+
+class UserUpdate(BaseModel):
+    full_name: str | None = None
+    age: int | None = None
+    school: str | None = None
+    grade: str | None = None
 
 class User(UserBase):
     id: int
