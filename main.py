@@ -79,13 +79,25 @@ def read_root():
 
 @app.post("/register", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    # 1. Verificar si el usuario ya existe
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
-    if db_user: raise HTTPException(status_code=400, detail="El usuario ya existe")
-    db_user = models.User(username=user.username, password=get_password_hash(user.password))
-    db.add(db_user)
+    if db_user:
+        raise HTTPException(status_code=400, detail="El nombre de usuario ya está registrado")
+    
+    # 2. Crear la instancia del modelo con los NUEVOS campos
+    new_user = models.User(
+        username=user.username,
+        password=get_password_hash(user.password),
+        full_name=user.full_name,
+        age=user.age,
+        school=user.school, 
+        grade=user.grade     
+    )
+    
+    db.add(new_user)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(new_user)
+    return new_user
 
 @app.post("/token")
 def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):

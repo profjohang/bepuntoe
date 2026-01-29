@@ -24,7 +24,6 @@ class ProjectUpdate(BaseModel):
 class Project(ProjectBase):
     id: int
     owner_id: int
-    # Definimos que la salida también será un diccionario
     phase1_empatizar: Optional[Dict[str, Any]] = {}
     phase2_definir: Optional[Dict[str, Any]] = {}
     phase3_idear: Optional[Dict[str, Any]] = {}
@@ -37,13 +36,16 @@ class Project(ProjectBase):
 # --- MOLDES PARA USUARIOS ---
 class UserBase(BaseModel):
     username: str
+    full_name: str
+    age: int
+    school: str
+    grade: str
 
 class UserCreate(UserBase):
     password: str
 
 class User(UserBase):
     id: int
-    projects: List[Project] = []
 
     class Config:
         from_attributes = True
