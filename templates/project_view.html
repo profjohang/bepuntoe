@@ -160,7 +160,7 @@
                 
                 <div class="input-group mb-4">
                     <input type="text" id="nueva_idea_input" class="form-control" placeholder="Escribe una idea aquí...">
-                    <button class="btn btn-success" type="button" onclick="agregarIdea()">
+                    <button class="btn btn-primary" type="button" onclick="agregarIdea()">
                         <i class="fas fa-plus me-2"></i>Añadir Idea
                     </button>
                 </div>
@@ -283,11 +283,28 @@
     const projectId = "{{ project.id }}";
     const progresoActual = "{{ total_progress }}"; 
 
-    try {
-        document.getElementById('barra-progreso').style.width = progresoActual + "%";
-    } catch (e) {
-        console.log("No se pudo actualizar la barra");
-    }
+    // --- NUEVO: Lógica para recordar la pestaña activa al recargar ---
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Revisar si hay una pestaña guardada en la memoria
+        const activeTabTarget = localStorage.getItem("activeTab");
+        
+        if (activeTabTarget) {
+            // 2. Buscar el botón que abre esa pestaña
+            const tabButton = document.querySelector(`button[data-bs-target="${activeTabTarget}"]`);
+            if (tabButton) {
+                // 3. Activar la pestaña usando Bootstrap
+                const tab = new bootstrap.Tab(tabButton);
+                tab.show();
+            }
+            // 4. Limpiar la memoria (opcional, por si el usuario navega manualmente después)
+            localStorage.removeItem("activeTab");
+        }
+
+        // Actualizar barra de progreso visualmente
+        try {
+            document.getElementById('barra-progreso').style.width = progresoActual + "%";
+        } catch (e) { console.log("No se pudo actualizar la barra"); }
+    });
 
     function updatePOV() {
         try {
@@ -305,6 +322,7 @@
         if (texto === "") return;
 
         const contenedor = document.getElementById('contenedor_ideas');
+        // NOTA: Aquí apliqué el estilo morado (btn-be) si ya lo configuraste, si no, usa warning
         const nuevaTarjeta = `
             <div class="col-md-4 idea-card" data-texto="${texto}">
                 <div class="p-3 bg-warning text-dark rounded shadow-sm h-100 position-relative border" style="min-height: 100px; cursor: pointer;">
@@ -317,11 +335,10 @@
         `;
         
         contenedor.insertAdjacentHTML('beforeend', nuevaTarjeta);
-        input.value = ""; // Limpiar input
+        input.value = ""; 
     }
 
     async function savePhase(phaseNumber) {
-        // 1. OBTENER EL TOKEN 
         const token = localStorage.getItem("access_token");
         
         if (!token) {
@@ -333,7 +350,7 @@
         let data = {};
         
         try {
-            // PREPARAR LOS DATOS
+            // Recolección de datos (Igual que antes)
             if (phaseNumber === 1) {
                 data = {
                     phase1_empatizar: {
@@ -361,33 +378,16 @@
                     alert("Agrega al menos una idea antes de guardar.");
                     return;
                 }
-
-                data = { 
-                    phase3_idear: { 
-                        ideas: listaIdeas 
-                    } 
-                };
+                data = { phase3_idear: { ideas: listaIdeas } };
             }
             else if (phaseNumber === 4) {
                 const ideaBase = document.getElementById('p4_idea_seleccionada').value;
                 const descripcion = document.getElementById('p4_descripcion').value;
 
-                if (!ideaBase) {
-                    alert("⚠️ Debes seleccionar una idea de la fase anterior.");
-                    return;
-                }
+                if (!ideaBase) { alert("⚠️ Selecciona una idea."); return; }
+                if (descripcion.length < 10) { alert("⚠️ Describe mejor tu prototipo."); return; }
 
-                if (descripcion.length < 10) {
-                    alert("⚠️ Por favor, brinda una descripción más detallada de tu prototipo.");
-                    return;
-                }
-
-                data = { 
-                    phase4_prototipar: { 
-                        idea_base: ideaBase,
-                        descripcion: descripcion 
-                    } 
-                };
+                data = { phase4_prototipar: { idea_base: ideaBase, descripcion: descripcion } };
             }
             else if (phaseNumber === 5) {
                 data = { 
@@ -398,34 +398,37 @@
                         nuevas_ideas: document.getElementById('p5_nuevas_ideas').value
                     } 
                 };
-                
-                // Validación mínima 
                 if (!data.phase5_testear.interesante && !data.phase5_testear.criticas) {
-                    alert("⚠️ Por favor, completa al menos los puntos interesantes o críticas para validar tu idea.");
+                    alert("⚠️ Completa al menos los puntos interesantes o críticas.");
                     return;
                 }
             }
 
-            // 2. ENVIAR AL SERVIDOR (Con el Token)
+            // Enviar al servidor
             const response = await fetch(`/projects/${projectId}`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`  // <--- ¡AQUÍ ESTÁ LA MAGIA!
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(data)
             });
 
             if (response.ok) {
+                // --- CAMBIO CLAVE AQUÍ ---
+                // 1. Guardamos en memoria "Quiero volver a la fase X"
+                localStorage.setItem("activeTab", "#phase" + phaseNumber);
+                
                 alert('✅ ¡Fase guardada exitosamente!');
-                location.reload();
+                
+                // 2. Al recargar, el script de arriba leerá la memoria y te llevará ahí
+                location.reload(); 
             } else {
-                // Si el token venció, nos dirá 401 de nuevo
                 if (response.status === 401) {
-                    alert('⏳ Tu sesión ha expirado. Inicia sesión de nuevo.');
+                    alert('⏳ Tu sesión expiró.');
                     window.location.href = "/login";
                 } else {
-                    alert('❌ Error al guardar en el servidor.');
+                    alert('❌ Error al guardar.');
                 }
             }
         } catch (error) {
