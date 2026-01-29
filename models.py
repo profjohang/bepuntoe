@@ -32,11 +32,11 @@ class Project(Base):
     
     # Fases del Design Thinking (JSON)
     # Es recomendable inicializarlos como diccionarios vacíos en el esquema más adelante
-    phase1_empathize = Column(JSON)
-    phase2_define = Column(JSON)
-    phase3_ideate = Column(JSON)
-    phase4_prototype = Column(JSON)
-    phase5_test = Column(JSON)
+    phase1_empatizar = Column(JSON)
+    phase2_definir = Column(JSON)
+    phase3_idear = Column(JSON)
+    phase4_prototipar = Column(JSON)
+    phase5_testear = Column(JSON)
 
     # Metadatos
     created_at = Column(DateTime(timezone=True), server_default=func.now())
