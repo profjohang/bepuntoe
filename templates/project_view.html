@@ -10,21 +10,20 @@
 {% set total_progress = p1 + p2 + p3 + p4 + p5 %}
 
 <div class="row mb-4">
-    <div class="row mb-3">
-        <div class="col-12">
-            <a href="/dashboard" class="btn btn-dark">
-                <i class="fas fa-arrow-left me-2"></i>Volver a mis proyectos
-            </a>
-        </div>
+    <div class="col-12 mb-3">
+        <a href="/dashboard" class="btn btn-dark">
+            <i class="fas fa-arrow-left me-2"></i>Volver a mis proyectos
+        </a>
     </div>
+    
     <div class="col-md-8">
-        <h2><i class="fas fa-rocket me-2"></i>{{ project.title }}</h2>
+        <h2>{{ project.title }}</h2>
         <p class="text-muted">{{ project.description }}</p>
     </div>
-<div class="col-md-4">
+    
+    <div class="col-md-4">
         <div class="d-flex justify-content-end align-items-center">
             <span class="text-muted small me-2">Progreso: {{ total_progress }}%</span>
-            
             <div class="progress" style="width: 150px; height: 10px;">
                 <div id="barra-progreso"
                      class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
@@ -37,6 +36,7 @@
             </div>
         </div>
     </div>
+</div>
 
 <ul class="nav nav-tabs mb-4" id="projectTabs" role="tablist">
     <li class="nav-item" role="presentation">
@@ -57,7 +57,8 @@
 </ul>
 
 <div class="tab-content" id="projectTabsContent">
-
+    
+    <!-- PHASE 1: EMPATIZAR -->
     <div class="tab-pane fade show active" id="phase1" role="tabpanel">
         <div class="card shadow-sm border-0">
             <div class="card-body">
@@ -97,11 +98,15 @@
                     <button class="btn btn-primary" onclick="savePhase(1)">
                         <i class="fas fa-save me-2"></i>Guardar Empatía
                     </button>
+                    <button class="btn btn-dark ms-2" onclick="continueToNextPhase(1)">
+                        Continuar <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- PHASE 2: DEFINIR -->
     <div class="tab-pane fade" id="phase2" role="tabpanel">
         <div class="card shadow-sm border-0">
             <div class="card-body">
@@ -147,11 +152,15 @@
                     <button class="btn btn-primary" onclick="savePhase(2)">
                         <i class="fas fa-save me-2"></i>Guardar Definición
                     </button>
+                    <button class="btn btn-dark ms-2" onclick="continueToNextPhase(2)">
+                        Continuar <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- PHASE 3: IDEAR -->
     <div class="tab-pane fade" id="phase3" role="tabpanel">
         <div class="card shadow-sm border-0">
             <div class="card-body">
@@ -184,11 +193,15 @@
                     <button class="btn btn-primary" onclick="savePhase(3)">
                         <i class="fas fa-save me-2"></i>Guardar Lluvia de Ideas
                     </button>
+                    <button class="btn btn-dark ms-2" onclick="continueToNextPhase(3)">
+                        Continuar <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- PHASE 4: PROTOTIPAR -->
     <div class="tab-pane fade" id="phase4" role="tabpanel">
         <div class="card shadow-sm border-0">
             <div class="card-body">
@@ -225,11 +238,15 @@
                     <button class="btn btn-primary" onclick="savePhase(4)">
                         <i class="fas fa-save me-2"></i>Guardar Prototipo
                     </button>
+                    <button class="btn btn-dark ms-2" onclick="continueToNextPhase(4)">
+                        Continuar <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- PHASE 5: TESTEAR -->
     <div class="tab-pane fade" id="phase5" role="tabpanel">
         <div class="card shadow-sm border-0">
             <div class="card-body">
@@ -267,7 +284,7 @@
                     <small class="text-muted">* Asegúrate de guardar antes de generar el resumen.</small>
                     <div>
                         <button class="btn btn-primary me-2" onclick="savePhase(5)">
-                            <i class="fas fa-save me-2"></i>Guardar Evaluación
+                            <i class="fas fa-save me-2"></i>Guardar Testeo
                         </button>
                         <a href="{{ url_for('project_summary', project_id=project.id) }}" class="btn btn-dark">
                             <i class="fas fa-file-pdf me-2"></i>Ver Resumen Final
@@ -277,82 +294,38 @@
             </div>
         </div>
     </div>
+    
 </div>
 
 <script>
     const projectId = "{{ project.id }}";
     const progresoActual = "{{ total_progress }}"; 
 
-    // --- NUEVO: Lógica para recordar la pestaña activa al recargar ---
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. Revisar si hay una pestaña guardada en la memoria
+        // 1. Manejo de pestañas persistentes
         const activeTabTarget = localStorage.getItem("activeTab");
-        
         if (activeTabTarget) {
-            // 2. Buscar el botón que abre esa pestaña
             const tabButton = document.querySelector(`button[data-bs-target="${activeTabTarget}"]`);
             if (tabButton) {
-                // 3. Activar la pestaña usando Bootstrap
                 const tab = new bootstrap.Tab(tabButton);
                 tab.show();
             }
-            // 4. Limpiar la memoria (opcional, por si el usuario navega manualmente después)
             localStorage.removeItem("activeTab");
         }
 
-        // Actualizar barra de progreso visualmente
+        // 2. Barra de progreso visual
         try {
             document.getElementById('barra-progreso').style.width = progresoActual + "%";
-        } catch (e) { console.log("No se pudo actualizar la barra"); }
+        } catch (e) { console.error("Error al actualizar barra:", e); }
     });
 
-    function updatePOV() {
+    /**
+     * CAPA 1: Recolección de datos del DOM
+     */
+    function getPhaseData(phaseNumber) {
         try {
-            document.getElementById('show_usuario').innerText = document.getElementById('p2_usuario').value || 'USUARIO';
-            document.getElementById('show_necesidad').innerText = document.getElementById('p2_necesidad').value || 'NECESIDAD';
-            document.getElementById('show_insight').innerText = document.getElementById('p2_insight').value || 'INSIGHT';
-        } catch(e) { console.log(e); }
-    }
-
-    // Función para añadir la tarjeta al tablero (solo visual)
-    function agregarIdea() {
-        const input = document.getElementById('nueva_idea_input');
-        const texto = input.value.trim();
-        
-        if (texto === "") return;
-
-        const contenedor = document.getElementById('contenedor_ideas');
-        // NOTA: Aquí apliqué el estilo morado (btn-be) si ya lo configuraste, si no, usa warning
-        const nuevaTarjeta = `
-            <div class="col-md-4 idea-card" data-texto="${texto}">
-                <div class="p-3 bg-warning text-dark rounded shadow-sm h-100 position-relative border" style="min-height: 100px; cursor: pointer;">
-                    ${texto}
-                    <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="this.closest('.idea-card').remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        contenedor.insertAdjacentHTML('beforeend', nuevaTarjeta);
-        input.value = ""; 
-    }
-
-    async function savePhase(phaseNumber) {
-        const token = localStorage.getItem("access_token");
-        
-        if (!token) {
-            alert("⚠️ No estás logueado. Por favor inicia sesión nuevamente.");
-            window.location.href = "/login";
-            return;
-        }
-
-        let data = {};
-        
-        try {
-            // Recolección de datos (Igual que antes)
             if (phaseNumber === 1) {
-                data = {
+                return {
                     phase1_empatizar: {
                         piensa: document.getElementById('p1_piensa').value,
                         siente: document.getElementById('p1_siente').value,
@@ -361,8 +334,8 @@
                     }
                 };
             } 
-            else if (phaseNumber === 2) {
-                data = {
+            if (phaseNumber === 2) {
+                return {
                     phase2_definir: {
                         usuario: document.getElementById('p2_usuario').value,
                         necesidad: document.getElementById('p2_necesidad').value,
@@ -370,27 +343,26 @@
                     }
                 };
             }   
-            else if (phaseNumber === 3) {
+            if (phaseNumber === 3) {
                 const tarjetas = document.querySelectorAll('.idea-card');
                 const listaIdeas = Array.from(tarjetas).map(t => t.getAttribute('data-texto'));
-                
                 if (listaIdeas.length === 0) {
-                    alert("Agrega al menos una idea antes de guardar.");
-                    return;
+                    alert("⚠️ Agrega al menos una idea.");
+                    return null;
                 }
-                data = { phase3_idear: { ideas: listaIdeas } };
+                return { phase3_idear: { ideas: listaIdeas } };
             }
-            else if (phaseNumber === 4) {
-                const ideaBase = document.getElementById('p4_idea_seleccionada').value;
-                const descripcion = document.getElementById('p4_descripcion').value;
-
-                if (!ideaBase) { alert("⚠️ Selecciona una idea."); return; }
-                if (descripcion.length < 10) { alert("⚠️ Describe mejor tu prototipo."); return; }
-
-                data = { phase4_prototipar: { idea_base: ideaBase, descripcion: descripcion } };
+            if (phaseNumber === 4) {
+                const idea = document.getElementById('p4_idea_seleccionada').value;
+                const desc = document.getElementById('p4_descripcion').value;
+                if (!idea || desc.length < 10) {
+                    alert("⚠️ Selecciona una idea y descríbela (mín. 10 caracteres).");
+                    return null;
+                }
+                return { phase4_prototipar: { idea_base: idea, descripcion: desc } };
             }
-            else if (phaseNumber === 5) {
-                data = { 
+            if (phaseNumber === 5) {
+                return { 
                     phase5_testear: { 
                         interesante: document.getElementById('p5_interesante').value,
                         criticas: document.getElementById('p5_criticas').value,
@@ -398,13 +370,25 @@
                         nuevas_ideas: document.getElementById('p5_nuevas_ideas').value
                     } 
                 };
-                if (!data.phase5_testear.interesante && !data.phase5_testear.criticas) {
-                    alert("⚠️ Completa al menos los puntos interesantes o críticas.");
-                    return;
-                }
             }
+        } catch (error) {
+            console.error("Error recolectando datos:", error);
+            return null;
+        }
+    }
 
-            // Enviar al servidor
+    /**
+     * CAPA 2: Comunicación con el Servidor
+     */
+    async function sendDataToServer(data) {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            alert("⚠️ Sesión no encontrada. Inicia sesión nuevamente.");
+            window.location.href = "/login";
+            return false;
+        }
+
+        try {
             const response = await fetch(`/projects/${projectId}`, {
                 method: 'PUT',
                 headers: { 
@@ -414,27 +398,77 @@
                 body: JSON.stringify(data)
             });
 
-            if (response.ok) {
-                // --- CAMBIO CLAVE AQUÍ ---
-                // 1. Guardamos en memoria "Quiero volver a la fase X"
-                localStorage.setItem("activeTab", "#phase" + phaseNumber);
-                
-                alert('✅ ¡Fase guardada exitosamente!');
-                
-                // 2. Al recargar, el script de arriba leerá la memoria y te llevará ahí
-                location.reload(); 
+            if (response.ok) return true;
+
+            if (response.status === 401) {
+                alert('⏳ Tu sesión ha expirado.');
+                window.location.href = "/login";
             } else {
-                if (response.status === 401) {
-                    alert('⏳ Tu sesión expiró.');
-                    window.location.href = "/login";
-                } else {
-                    alert('❌ Error al guardar.');
-                }
+                const err = await response.json();
+                alert('❌ Error: ' + (err.message || 'No se pudo guardar'));
             }
+            return false;
         } catch (error) {
-            console.error(error);
-            alert('⚠️ Error de conexión.');
+            console.error("Fetch error:", error);
+            alert('⚠️ Error de conexión con el servidor.');
+            return false;
         }
+    }
+
+    /**
+     * CAPA 3: Acciones de Usuario
+     */
+    async function savePhase(phaseNumber) {
+        const data = getPhaseData(phaseNumber);
+        if (!data) return;
+
+        const success = await sendDataToServer(data);
+        if (success) {
+            localStorage.setItem("activeTab", "#phase" + phaseNumber);
+            alert('✅ ¡Fase guardada exitosamente!');
+            location.reload();
+        }
+    }
+
+    async function continueToNextPhase(phaseNumber) {
+        const data = getPhaseData(phaseNumber);
+        if (!data) return;
+
+        const success = await sendDataToServer(data);
+        if (success) {
+            // Guardar la siguiente fase para la recarga
+            localStorage.setItem("activeTab", "#phase" + (phaseNumber + 1));
+            location.reload(); 
+        }
+    }
+
+    // Funciones auxiliares visuales
+    function updatePOV() {
+        try {
+            document.getElementById('show_usuario').innerText = document.getElementById('p2_usuario').value || 'USUARIO';
+            document.getElementById('show_necesidad').innerText = document.getElementById('p2_necesidad').value || 'NECESIDAD';
+            document.getElementById('show_insight').innerText = document.getElementById('p2_insight').value || 'INSIGHT';
+        } catch(e) {}
+    }
+
+    function agregarIdea() {
+        const input = document.getElementById('nueva_idea_input');
+        const texto = input.value.trim();
+        if (texto === "") return;
+
+        const contenedor = document.getElementById('contenedor_ideas');
+        const nuevaTarjeta = `
+            <div class="col-md-4 idea-card" data-texto="${texto}">
+                <div class="p-3 bg-warning text-dark rounded shadow-sm h-100 position-relative border">
+                    ${texto}
+                    <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="this.closest('.idea-card').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        contenedor.insertAdjacentHTML('beforeend', nuevaTarjeta);
+        input.value = ""; 
     }
 </script>
 
