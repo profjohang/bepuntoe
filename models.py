@@ -9,8 +9,6 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True, nullable=False)
     password = Column(String(255), nullable=False)
-    
-    # Perfil del estudiante (Nuevos campos con límites)
     full_name = Column(String(150))
     age = Column(Integer)
     school = Column(String(150))
@@ -31,7 +29,6 @@ class Project(Base):
     description = Column(String(500))
     
     # Fases del Design Thinking (JSON)
-    # Es recomendable inicializarlos como diccionarios vacíos en el esquema más adelante
     phase1_empatizar = Column(JSON)
     phase2_definir = Column(JSON)
     phase3_idear = Column(JSON)

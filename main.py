@@ -126,7 +126,6 @@ def update_user_profile(
     
     return {"message": "Perfil actualizado correctamente", "user": current_user.username}
 
-# --- NUEVA RUTA: Obtener datos del perfil ---
 @app.get("/users/me", response_model=schemas.User)
 def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
@@ -185,7 +184,7 @@ def project_workspace_page(project_id: int, request: Request, db: Session = Depe
 
 @app.get("/project/summary/{project_id}", response_class=HTMLResponse)
 def project_summary(project_id: int, request: Request, db: Session = Depends(get_db)):
-    # Buscamos el proyecto para mostrar sus datos en el resumen
+
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
     if not project:
         raise HTTPException(status_code=404, detail="Proyecto no encontrado")
