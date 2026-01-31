@@ -1,5 +1,5 @@
 # schemas.py
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 
 # --- MOLDES PARA PROYECTOS ---
@@ -42,7 +42,7 @@ class UserBase(BaseModel):
     grade: str
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(..., min_length=6, description="Contraseña debe tener mínimo 6 caracteres")
 
 class UserUpdate(BaseModel):
     full_name: str | None = None

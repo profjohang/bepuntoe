@@ -42,8 +42,12 @@
 
                     <div class="mb-3">
                         <label for="password" class="form-label fw-semibold">Contraseña</label>
-                        <input type="password" class="form-control" id="password" required placeholder="Mínimo 6 caracteres">
-                    </div>
+                        <input type="password" class="form-control" id="password" 
+                            required 
+                            minlength="6" 
+                            placeholder="Mínimo 6 caracteres">
+                        <small class="text-muted">Debe tener al menos 6 caracteres</small>
+                    </div
 
                     <button type="submit" class="btn btn-primary w-100 mt-2 shadow-sm">
                         Registrarme ahora
