@@ -16,11 +16,11 @@
                 <form id="loginForm">
                     <div class="mb-3">
                         <label for="username" class="form-label fw-semibold">Usuario</label>
-                        <input type="text" class="form-control" id="username" required placeholder="Tu usuario">
+                        <input type="text" name="username" class="form-control" id="username" required placeholder="Tu usuario">
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label fw-semibold">Contraseña</label>
-                        <input type="password" class="form-control" id="password" required placeholder="••••••••">
+                        <input type="password" name="password" class="form-control" id="password" required placeholder="••••••••">
                     </div>
                     <button type="submit" class="btn btn-primary w-100 mt-2 shadow-sm">
                         Entrar a mi espacio
@@ -44,37 +44,28 @@
 <script>
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        // FormData extraerá los valores usando los atributos 'name' que pusimos arriba
         const formData = new FormData(e.target);
-        const errorMsg = document.getElementById('errorMsg');
 
         try {
             const response = await fetch('/token', {
                 method: 'POST',
-                body: formData
+                body: formData 
             });
 
             if (response.ok) {
                 const data = await response.json();
-                // 1. Limpieza total para evitar conflictos con 'token' vs 'access_token'
-                localStorage.clear(); 
-                // 2. Guardamos el token con el nombre estandarizado
+                // Limpieza y guardado
+                localStorage.clear();
                 localStorage.setItem('access_token', data.access_token);
-                // 3. Redirección inmediata al dashboard
                 window.location.href = '/dashboard'; 
             } else {
-                showModal(
-                    'Acceso Denegado', 
-                    'Usuario o contraseña incorrectos. Por favor, verifica tus datos.', 
-                    null
-                );
+                showModal('Acceso Denegado', 'Usuario o contraseña incorrectos.', null);
             }
         } catch (error) {
-            console.error('Error en login:', error);
-            showModal(
-                'Error de Conexión', 
-                'No se pudo conectar con el servidor b.e. Revisa tu conexión a internet.', 
-                null
-            );
+            console.error('Error:', error);
+            showModal('Error de Conexión', 'No se pudo conectar con el servidor.', null);
         }
     });
 </script>
