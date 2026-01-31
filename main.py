@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Annotated
+from dotenv import load_dotenv
 
 from fastapi import FastAPI, Request, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse
@@ -18,6 +19,9 @@ import models
 import schemas
 from database import SessionLocal, engine
 
+# --- CARGAR VARIABLES DE ENTORNO ---
+load_dotenv()
+
 # --- INICIALIZACIÓN ---
 app = FastAPI()
 
@@ -27,7 +31,8 @@ app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # --- SEGURIDAD ---
-SECRET_KEY = "clave_secreta_proyecto_be_mvp" 
+import os
+SECRET_KEY = os.getenv("SECRET_KEY", "clave_temporal_solo_desarrollo")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
