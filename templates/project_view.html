@@ -464,18 +464,16 @@
         }
     }
 
-    function goToPhase(phaseNumber) {
-        // Guardamos la pestaña a la que queremos ir en el localStorage
-        localStorage.setItem("activeTab", "#phase" + phaseNumber);
+    async function savePhase(phaseNumber) {
+        const data = getPhaseData(phaseNumber);
+        if (!data) {
+            showModal('Datos incompletos', 'Por favor completa los campos requeridos antes de guardar.', null);
+            return;
+        }
         
-        // Cambiamos de pestaña usando el sistema de Bootstrap
-        const nextTabEl = document.querySelector(`button[data-bs-target="#phase${phaseNumber}"]`);
-        if (nextTabEl) {
-            const tab = new bootstrap.Tab(nextTabEl);
-            tab.show();
-            
-            // Opcional: Desplazar hacia arriba para que el usuario vea el inicio de la fase
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        const success = await sendDataToServer(data);
+        if (success) {
+            showModal('¡Guardado!', 'Tus cambios se guardaron correctamente.', null);
         }
     }
 
