@@ -47,7 +47,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary" onclick="saveProfile()">Guardar Cambios</button>
             </div>
         </div>
@@ -120,6 +120,7 @@
 
 <script>
     const token = localStorage.getItem("access_token");
+    
     if (!token) window.location.href = "/login";
 
     async function loadUserProfile() {
@@ -151,35 +152,38 @@
     }
 
     async function saveProfile() {
-    const token = localStorage.getItem("access_token");
-    
-    const data = {
-        full_name: document.getElementById('edit_fullname').value,
-        age: document.getElementById('edit_age').value,
-        school: document.getElementById('edit_school').value,
-        grade: document.getElementById('edit_grade').value
-    };
+        const token = localStorage.getItem("access_token"); 
+        
+        const data = {
+            full_name: document.getElementById('edit_fullname').value,
+            age: document.getElementById('edit_age').value,
+            school: document.getElementById('edit_school').value,
+            grade: document.getElementById('edit_grade').value
+        };
 
-    try {
-        const response = await fetch("/users/me/profile", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(data)
-        });
+        try {
+            const response = await fetch("/users/me/profile", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
 
-        if (response.ok) {
-            alert("✅ Perfil actualizado con éxito");
-            location.reload(); // Recargamos para ver los cambios
-        } else {
-            alert("❌ Hubo un error al actualizar.");
+            if (response.ok) {
+                // Mostrar el modal y PASAR la función de recarga como callback
+                showModal('¡Logrado!', 'Tu perfil se ha actualizado con éxito.', function() {
+                    location.reload(); 
+                });
+                
+            } else {
+                showModal('Error', '❌ Hubo un error al actualizar los datos del perfil.', null);
+            }
+        } catch (error) {
+            console.error("Error en la petición:", error);
+            showModal('Error de Conexión', '⚠️ No se pudo conectar con el servidor.', null);
         }
-    } catch (error) {
-        console.error(error);
-        alert("⚠️ Error de conexión.");
-    }
     }
 
     async function loadProjects() {
@@ -244,10 +248,47 @@
     });
 
     async function deleteProject(id, title) {
-        if (confirm(`¿Borrar "${title}"?`) && confirm("¿Confirmas la eliminación definitiva?")) {
-            const res = await fetch(`/projects/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-            if (res.ok) document.getElementById(`project-card-${id}`).remove();
-        }
+        const token = localStorage.getItem("access_token");
+        // 1. Primera confirmación
+        showModal(
+            '¿Borrar proyecto?', 
+            `¿Estás seguro de que quieres borrar "${title}"?`, 
+            function() {
+                // Esperar un momento para mejorar la experiencia
+                setTimeout(() => {
+                    
+                    // 2. Validación definitiva
+                    showModal(
+                        'Confirmación Final', 
+                        'Esta acción es definitiva y no se puede deshacer. ¿Confirmas la eliminación?', 
+                        async function() {
+                            try {
+                                const res = await fetch(`/projects/${id}`, { 
+                                    method: 'DELETE', 
+                                    headers: { 'Authorization': `Bearer ${token}` } 
+                                });
+
+                                if (res.ok) {
+                                    // 3. Eliminación visual
+                                    const element = document.getElementById(`project-card-${id}`);
+                                    if (element) element.remove();
+                                    
+                                    // Feedback de éxito
+                                    setTimeout(() => {
+                                        showModal('Eliminado', 'El proyecto ha sido borrado correctamente.', null);
+                                    }, 300);
+                                } else {
+                                    showModal('Error', 'No se pudo eliminar el proyecto.', null);
+                                }
+                            } catch (error) {
+                                console.error("Error en la petición:", error);
+                                showModal('Error', 'Ocurrió un error de red.', null);
+                            }
+                        }
+                    );
+                }, 300); 
+            }
+        );
     }
 
     document.getElementById('createProjectForm').addEventListener('submit', async (e) => {

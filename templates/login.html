@@ -44,10 +44,8 @@
 <script>
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const formData = new FormData();
-        formData.append('username', document.getElementById('username').value);
-        formData.append('password', document.getElementById('password').value);
+        const formData = new FormData(e.target);
+        const errorMsg = document.getElementById('errorMsg');
 
         try {
             const response = await fetch('/token', {
@@ -57,16 +55,26 @@
 
             if (response.ok) {
                 const data = await response.json();
+                // 1. Limpieza total para evitar conflictos con 'token' vs 'access_token'
+                localStorage.clear(); 
+                // 2. Guardamos el token con el nombre estandarizado
                 localStorage.setItem('access_token', data.access_token);
+                // 3. Redirección inmediata al dashboard
                 window.location.href = '/dashboard'; 
             } else {
-                document.getElementById('errorMsg').innerText = "Usuario o contraseña incorrectos";
-                document.getElementById('errorMsg').style.display = 'block';
+                showModal(
+                    'Acceso Denegado', 
+                    'Usuario o contraseña incorrectos. Por favor, verifica tus datos.', 
+                    null
+                );
             }
         } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('errorMsg').innerText = "Error de conexión con el servidor";
-            document.getElementById('errorMsg').style.display = 'block';
+            console.error('Error en login:', error);
+            showModal(
+                'Error de Conexión', 
+                'No se pudo conectar con el servidor b.e. Revisa tu conexión a internet.', 
+                null
+            );
         }
     });
 </script>

@@ -21,13 +21,33 @@
         .navbar { background-color: var(--be-blue) !important; }
         
         /* Botones con identidad b.e */
-        .btn-primary { 
-            background-color: var(--be-blue); 
-            border-color: var(--be-blue); 
+        .btn-primary {
+            background-color: var(--be-blue) !important;
+            border-color: var(--be-blue) !important;
+            transition: background-color 0.3s ease, transform 0.2s ease !important;
         }
-        .btn-primary:hover { 
-            background-color: var(--be-dark-blue); 
-            border-color: var(--be-dark-blue); 
+
+        .btn-primary:hover {
+            background-color: var(--be-dark-blue) !important;
+            border-color: var(--be-dark-blue) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-dark {
+            background-color: var(--be-black) !important;
+            border-color: var(--be-black) !important;
+            transition: background-color 0.3s ease, transform 0.2s ease !important;
+        }
+
+        .btn-dark:hover {
+            background-color: #333 !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary:active, .btn-dark:active {
+            transform: translateY(1px) !important;
         }
 
         .text-primary { color: var(--be-blue) !important; }
@@ -36,6 +56,32 @@
         .navbar-brand img {
             height: 40px;
             margin-right: 10px;
+        }
+
+        /* Estilos para el Modal Personalizado b.e */
+        .modal-overlay {
+            display: none; 
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(10, 10, 13, 0.8); /* Usando var(--be-black) con transparencia */ 
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content-custom {
+            background: var(--be-white);
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-overlay.active {
+            display: flex;
         }
     </style>
 </head>
@@ -62,6 +108,17 @@
         {% block content %}{% endblock %}
     </div>
 
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content-custom">
+            <h3 id="modalTitle" class="fw-bold mb-3" style="color: var(--be-blue);"></h3>
+            <p id="modalMessage" class="mb-4"></p>
+            <div class="d-flex justify-content-center gap-2">
+                <button onclick="closeModal()" class="btn btn-dark">Cancelar</button>
+                <button id="modalConfirmBtn" class="btn btn-primary">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         
@@ -69,10 +126,37 @@
             document.getElementById('btnLogout').style.display = 'block';
         }
 
-        document.getElementById('btnLogout').addEventListener('click', () => {
-            localStorage.removeItem('access_token');
-            window.location.href = '/login';
+        document.getElementById('btnLogout').addEventListener('click', (e) => {
+            e.preventDefault(); 
+
+            showModal(
+                '¿Cerrar sesión?', 
+                'Estás a punto de salir de b.e. Asegúrate de haber guardado tus cambios.', 
+                function() {
+                    localStorage.removeItem('access_token');
+                    window.location.href = '/login';
+                }
+            );
         });
+        
+        function showModal(title, message, confirmCallback) {
+            const modal = document.getElementById('customModal');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            confirmBtn.onclick = function() {
+                if(confirmCallback) confirmCallback();
+                closeModal();
+            };
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').classList.remove('active');
+        }
+
     </script>
 </body>
 </html>
