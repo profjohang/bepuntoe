@@ -93,7 +93,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="mt-4 text-end">
                     <button class="btn btn-primary" onclick="savePhase(1)">
                         <i class="fas fa-save me-2"></i>Guardar Empatía
@@ -147,19 +146,25 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="mt-4 text-end">
-                    <button class="btn btn-primary" onclick="savePhase(2)">
-                        <i class="fas fa-save me-2"></i>Guardar Definición
-                    </button>
-                    <button class="btn btn-dark ms-2" onclick="continueToNextPhase(2)">
-                        Continuar <i class="fas fa-arrow-right ms-2"></i>
-                    </button>
+                
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="button" class="btn btn-dark" onclick="GoBackPhase(2)">
+                            <i class="fas fa-arrow-left me-2"></i>Anterior
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary ms-2" onclick="savePhase(2)">
+                            <i class="fas fa-save me-2"></i>Guardar Definición
+                        </button>
+                        <button class="btn btn-dark ms-2" onclick="continueToNextPhase(2)">
+                            Continuar <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
+    </div>    
     <!-- PHASE 3: IDEAR -->
     <div class="tab-pane fade" id="phase3" role="tabpanel">
         <div class="card shadow-sm border-0">
@@ -188,19 +193,24 @@
                         {% endfor %}
                     {% endif %}
                 </div>
-
-                <div class="mt-4 text-end">
-                    <button class="btn btn-primary" onclick="savePhase(3)">
-                        <i class="fas fa-save me-2"></i>Guardar Lluvia de Ideas
-                    </button>
-                    <button class="btn btn-dark ms-2" onclick="continueToNextPhase(3)">
-                        Continuar <i class="fas fa-arrow-right ms-2"></i>
-                    </button>
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="button" class="btn btn-dark" onclick="GoBackPhase(3)">
+                            <i class="fas fa-arrow-left me-2"></i>Anterior
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary ms-2" onclick="savePhase(3)">
+                            <i class="fas fa-save me-2"></i>Guardar Ideación
+                        </button>
+                        <button class="btn btn-dark ms-2" onclick="continueToNextPhase(3)">
+                            Continuar <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- PHASE 4: PROTOTIPAR -->
     <div class="tab-pane fade" id="phase4" role="tabpanel">
         <div class="card shadow-sm border-0">
@@ -233,19 +243,24 @@
                             placeholder="¿Cómo funciona? ¿Qué materiales usa? ¿Cómo interactúa el usuario con él?">{{ project.phase4_prototipar.get('descripcion', '') if project.phase4_prototipar else '' }}</textarea>
                     </div>
                 </div>
-
-                <div class="mt-4 text-end">
-                    <button class="btn btn-primary" onclick="savePhase(4)">
-                        <i class="fas fa-save me-2"></i>Guardar Prototipo
-                    </button>
-                    <button class="btn btn-dark ms-2" onclick="continueToNextPhase(4)">
-                        Continuar <i class="fas fa-arrow-right ms-2"></i>
-                    </button>
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="button" class="btn btn-dark" onclick="GoBackPhase(4)">
+                            <i class="fas fa-arrow-left me-2"></i>Anterior
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary ms-2" onclick="savePhase(4)">
+                            <i class="fas fa-save me-2"></i>Guardar Prototipado
+                        </button>
+                        <button class="btn btn-dark ms-2" onclick="continueToNextPhase(4)">
+                            Continuar <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- PHASE 5: TESTEAR -->
     <div class="tab-pane fade" id="phase5" role="tabpanel">
         <div class="card shadow-sm border-0">
@@ -280,8 +295,12 @@
                     </div>
                 </div>
 
-                <div class="mt-4 d-flex justify-content-between">
-                    <small class="text-muted">* Asegúrate de guardar antes de generar el resumen.</small>
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="button" class="btn btn-dark" onclick="GoBackPhase(5)">
+                            <i class="fas fa-arrow-left me-2"></i>Anterior
+                        </button>
+                    </div>
                     <div>
                         <button class="btn btn-primary me-2" onclick="savePhase(5)">
                             <i class="fas fa-save me-2"></i>Guardar Testeo
@@ -418,15 +437,19 @@
     /**
      * CAPA 3: Acciones de Usuario
      */
-    async function savePhase(phaseNumber) {
-        const data = getPhaseData(phaseNumber);
-        if (!data) return;
+    async function GoBackPhase(currentPhase) {
+        const data = getPhaseData(currentPhase);
+        
+        if (!data) {
+            localStorage.setItem("activeTab", "#phase" + (currentPhase - 1));
+            location.reload();
+            return;
+        }
 
         const success = await sendDataToServer(data);
-        if (success) {
-            localStorage.setItem("activeTab", "#phase" + phaseNumber);
-            showModal('¡Fase Guardada!', 'Tu progreso se ha guardado exitosamente.', null);
-        }
+        
+        localStorage.setItem("activeTab", "#phase" + (currentPhase - 1));
+        location.reload(); 
     }
 
     async function continueToNextPhase(phaseNumber) {
@@ -438,6 +461,21 @@
             // Guardar la siguiente fase para la recarga
             localStorage.setItem("activeTab", "#phase" + (phaseNumber + 1));
             location.reload(); 
+        }
+    }
+
+    function goToPhase(phaseNumber) {
+        // Guardamos la pestaña a la que queremos ir en el localStorage
+        localStorage.setItem("activeTab", "#phase" + phaseNumber);
+        
+        // Cambiamos de pestaña usando el sistema de Bootstrap
+        const nextTabEl = document.querySelector(`button[data-bs-target="#phase${phaseNumber}"]`);
+        if (nextTabEl) {
+            const tab = new bootstrap.Tab(nextTabEl);
+            tab.show();
+            
+            // Opcional: Desplazar hacia arriba para que el usuario vea el inicio de la fase
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
