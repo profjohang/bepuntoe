@@ -425,10 +425,8 @@
         const success = await sendDataToServer(data);
         if (success) {
             localStorage.setItem("activeTab", "#phase" + phaseNumber);
-            showModal('¡Fase Guardada!', 'Tu progreso se ha guardado exitosamente.', function() {
-            location.reload(); 
-        });
-    }
+            showModal('¡Fase Guardada!', 'Tu progreso se ha guardado exitosamente.', null);
+        }
     }
 
     async function continueToNextPhase(phaseNumber) {
