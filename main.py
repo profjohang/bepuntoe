@@ -94,7 +94,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         username=user.username,
         password=get_password_hash(user.password),
         full_name=user.full_name,
-        age=user.age,
+        birth_date=user.birth_date,
         school=user.school, 
         grade=user.grade     
     )
@@ -119,14 +119,14 @@ def update_user_profile(
 ):
     if user_update.full_name is not None:
         current_user.full_name = user_update.full_name
-    if user_update.age is not None:
-        current_user.age = user_update.age
+    if user_update.birth_date is not None:          
+        current_user.birth_date = user_update.birth_date  
     if user_update.school is not None:
         current_user.school = user_update.school
     if user_update.grade is not None:
         current_user.grade = user_update.grade
     
-    db.commit() # Guardamos en MySQL
+    db.commit()
     db.refresh(current_user)
     
     return {"message": "Perfil actualizado correctamente", "user": current_user.username}

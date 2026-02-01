@@ -1,6 +1,7 @@
 # schemas.py
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List, Dict, Any
+from datetime import date, datetime
 
 # --- MOLDES PARA PROYECTOS ---
 
@@ -37,16 +38,30 @@ class Project(ProjectBase):
 class UserBase(BaseModel):
     username: str
     full_name: str
-    age: int
+    birth_date: date = Field(..., description="Fecha de nacimiento")
     school: str
     grade: str
+    
+    @field_validator('birth_date')
+    @classmethod
+    def validate_age(cls, v):
+        """Validar que el usuario tenga entre 10 y 25 años"""
+        today = date.today()
+        age = today.year - v.year - ((today.month, today.day) < (v.month, v.day))
+        
+        if age < 10:
+            raise ValueError('Debes tener al menos 10 años para registrarte')
+        if age > 25:
+            raise ValueError('Debes tener máximo 25 años para registrarte')
+        
+        return v
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=6, description="Contraseña debe tener mínimo 6 caracteres")
 
 class UserUpdate(BaseModel):
     full_name: str | None = None
-    age: int | None = None
+    birth_date: date | None = None
     school: str | None = None
     grade: str | None = None
 

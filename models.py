@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, JSON, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, JSON, ForeignKey, DateTime, Date
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func # Para manejar fechas automáticas
+from sqlalchemy.sql import func
 from database import Base
 
 class User(Base):
@@ -10,7 +10,7 @@ class User(Base):
     username = Column(String(50), unique=True, index=True, nullable=False)
     password = Column(String(255), nullable=False)
     full_name = Column(String(150))
-    age = Column(Integer)
+    birth_date = Column(Date) 
     school = Column(String(150))
     grade = Column(String(50))
     

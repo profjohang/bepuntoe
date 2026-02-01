@@ -16,38 +16,41 @@
                 <form id="registerForm">
                     <div class="mb-3">
                         <label for="username" class="form-label fw-semibold">Nombre de usuario</label>
-                        <input type="text" class="form-control" id="username" required placeholder="Ej: juan_p">
+                        <input type="text" class="form-control" id="username" name="username" required placeholder="Ej: juan_p">
                     </div>
 
                     <div class="mb-3">
                         <label for="full_name" class="form-label fw-semibold">Nombre y Apellido</label>
-                        <input type="text" class="form-control" id="full_name" required placeholder="Ej: Juan Pérez">
+                        <input type="text" class="form-control" id="full_name" name="full_name" required placeholder="Ej: Juan Pérez">
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="age" class="form-label fw-semibold">Edad</label>
-                            <input type="number" class="form-control" id="age" required placeholder="Ej: 15">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="grade" class="form-label fw-semibold">Grado</label>
-                            <input type="text" class="form-control" id="grade" required placeholder="Ej: 10° A">
-                        </div>
+                    <div class="mb-3">
+                        <label for="birth_date" class="form-label fw-semibold">Fecha de Nacimiento</label>
+                        <input type="date" class="form-control" id="birth_date" name="birth_date"
+                            required 
+                            max="{{ max_date }}" 
+                            min="{{ min_date }}">
+                        <small class="text-muted d-block">Debes tener entre 10 y 25 años</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="grade" class="form-label fw-semibold">Grado</label>
+                        <input type="text" class="form-control" id="grade" name="grade" required placeholder="Ej: 10° A">
                     </div>
 
                     <div class="mb-3">
                         <label for="school" class="form-label fw-semibold">Colegio</label>
-                        <input type="text" class="form-control" id="school" required placeholder="Nombre de tu institución">
+                        <input type="text" class="form-control" id="school" name="school" required placeholder="Nombre de tu institución">
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label fw-semibold">Contraseña</label>
-                        <input type="password" class="form-control" id="password" 
+                        <input type="password" class="form-control" id="password" name="password"
                             required 
                             minlength="6" 
                             placeholder="Mínimo 6 caracteres">
-                        <small class="text-muted">Debe tener al menos 6 caracteres</small>
-                    </div
+                        <small class="text-muted d-block">Debe tener al menos 6 caracteres</small>
+                    </div>
 
                     <button type="submit" class="btn btn-primary w-100 mt-2 shadow-sm">
                         Registrarme ahora
@@ -75,7 +78,7 @@
         // Captura de todos los campos, incluyendo los nuevos
         const username = document.getElementById('username').value;
         const full_name = document.getElementById('full_name').value;
-        const age = parseInt(document.getElementById('age').value); // Convertimos a número
+        const birth_date = document.getElementById('birth_date').value; 
         const school = document.getElementById('school').value;
         const grade = document.getElementById('grade').value;
         const password = document.getElementById('password').value;
@@ -89,7 +92,7 @@
                     username, 
                     password, 
                     full_name, 
-                    age, 
+                    birth_date, 
                     school, 
                     grade 
                 })
