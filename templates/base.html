@@ -66,8 +66,10 @@
         .modal-overlay {
             display: none; 
             position: fixed;
-            top: 0; left: 0;
-            width: 125vw; height: 125vh;
+            top: 0; 
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(10, 10, 13, 0.8);
             z-index: 2000;
             justify-content: center;
@@ -85,7 +87,7 @@
         }
 
         .modal-overlay.active {
-            display: flex;
+            display: flex !important;
         } 
     </style>
 </head>
