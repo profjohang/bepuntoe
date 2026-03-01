@@ -1,34 +1,43 @@
-# models.py
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, JSON, ForeignKey, DateTime, Date
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from database import Base
 
-# Tabla de Usuarios
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True) # Nombre de usuario único
-    password = Column(String) # Aquí guardaremos la contraseña
+    username = Column(String(50), unique=True, index=True, nullable=False)
+    password = Column(String(255), nullable=False)
+    full_name = Column(String(150))
+    birth_date = Column(Date) 
+    school = Column(String(150))
+    grade = Column(String(50))
     
-    # Relación: Un usuario puede tener muchos proyectos
-    projects = relationship("Project", back_populates="owner")
+    # Metadatos
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-# Tabla de Proyectos (Simplificada para el MVP)
+    # Relación: Si se borra el usuario, se borran sus proyectos (cascade)
+    projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
+
+
 class Project(Base):
     __tablename__ = "projects"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(String)
+    title = Column(String(150), index=True, nullable=False)
+    description = Column(String(500))
     
-    # Guardamos las respuestas de cada fase como texto largo en estas columnas.
-    phase1_empatizar = Column(Text, default="") 
-    phase2_definir = Column(Text, default="")
-    phase3_idear = Column(Text, default="")
-    phase4_prototipar = Column(Text, default="")
-    phase5_testear = Column(Text, default="")
+    # Fases del Design Thinking (JSON)
+    phase1_empatizar = Column(JSON)
+    phase2_definir = Column(JSON)
+    phase3_idear = Column(JSON)
+    phase4_prototipar = Column(JSON)
+    phase5_testear = Column(JSON)
 
-    # Conexión con el usuario dueño del proyecto
+    # Metadatos
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
     owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="projects")

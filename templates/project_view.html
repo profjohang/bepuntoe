@@ -1,121 +1,510 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+{% set p1 = 20 if project.phase1_empatizar else 0 %}
+{% set p2 = 20 if project.phase2_definir else 0 %}
+{% set p3 = 20 if project.phase3_idear and project.phase3_idear.get('ideas') and project.phase3_idear.get('ideas')|length > 0 else 0 %}
+{% set p4 = 20 if project.phase4_prototipar and project.phase4_prototipar.get('descripcion') else 0 %}
+{% set p5 = 20 if project.phase5_testear and (project.phase5_testear.get('interesante') or project.phase5_testear.get('criticas')) else 0 %}
+{% set total_progress = p1 + p2 + p3 + p4 + p5 %}
+
 <div class="row mb-4">
-    <div class="col">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/dashboard">Mis Proyectos</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Espacio de Trabajo</li>
-            </ol>
-        </nav>
-        <h2 id="projectTitleDisplay" class="fw-bold">Cargando proyecto...</h2>
+    <div class="col-12 mb-3">
+        <a href="/dashboard" class="btn btn-dark">
+            <i class="fas fa-arrow-left me-2"></i>Volver a mis proyectos
+        </a>
     </div>
-    <div class="col-auto">
-        <button onclick="saveProject()" class="btn btn-success">💾 Guardar Todo</button>
-        <a href="/project/summary/{{ project_id }}" class="btn btn-outline-dark">📋 Ver Resumen</a>
+    
+    <div class="col-md-8">
+        <h2>{{ project.title }}</h2>
+        <p class="text-muted">{{ project.description }}</p>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="d-flex justify-content-end align-items-center">
+            <span class="text-muted small me-2">Progreso: {{ total_progress }}%</span>
+            <div class="progress" style="width: 150px; height: 10px;">
+                <div id="barra-progreso"
+                     class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                     role="progressbar" 
+                     style="width: 0%;" 
+                     aria-valuenow="{{ total_progress }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
-    <li class="nav-item"><button class="nav-link active" id="fase1-tab" data-bs-toggle="tab" data-bs-target="#fase1" type="button">1. Empatizar</button></li>
-    <li class="nav-item"><button class="nav-link" id="fase2-tab" data-bs-toggle="tab" data-bs-target="#fase2" type="button">2. Definir</button></li>
-    <li class="nav-item"><button class="nav-link" id="fase3-tab" data-bs-toggle="tab" data-bs-target="#fase3" type="button">3. Idear</button></li>
-    <li class="nav-item"><button class="nav-link" id="fase4-tab" data-bs-toggle="tab" data-bs-target="#fase4" type="button">4. Prototipar</button></li>
-    <li class="nav-item"><button class="nav-link" id="fase5-tab" data-bs-toggle="tab" data-bs-target="#fase5" type="button">5. Testear</button></li>
+<ul class="nav nav-tabs mb-4" id="projectTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="p1-tab" data-bs-toggle="tab" data-bs-target="#phase1" type="button" role="tab">1. Empatizar</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="p2-tab" data-bs-toggle="tab" data-bs-target="#phase2" type="button" role="tab">2. Definir</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="p3-tab" data-bs-toggle="tab" data-bs-target="#phase3" type="button" role="tab">3. Idear</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="p4-tab" data-bs-toggle="tab" data-bs-target="#phase4" type="button" role="tab">4. Prototipar</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="p5-tab" data-bs-toggle="tab" data-bs-target="#phase5" type="button" role="tab">5. Testear</button>
+    </li>
 </ul>
 
-<div class="tab-content bg-white p-4 border border-top-0 rounded-bottom shadow-sm" id="myTabContent">
+<div class="tab-content" id="projectTabsContent">
     
-    <div class="tab-pane fade show active" id="fase1">
-        <h4>🗺️ Mapa de Empatía</h4>
-        <p class="text-muted">Describe a tu usuario: ¿Qué piensa, siente, ve y escucha?</p>
-        <textarea id="input_phase1" class="form-control" rows="10" placeholder="Escribe aquí tus hallazgos de la fase de Empatía..."></textarea>
+    <!-- PHASE 1: EMPATIZAR -->
+    <div class="tab-pane fade show active" id="phase1" role="tabpanel">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Mapa de Empatía</h4>
+                <p class="text-muted small mb-4">
+                    Observa a tu usuario y completa los 4 cuadrantes.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded h-100 border">
+                            <label class="form-label fw-bold"><i class="fas fa-brain me-2"></i>¿Qué Piensa?</label>
+                            <textarea class="form-control" id="p1_piensa" rows="4">{{ project.phase1_empatizar.get('piensa', '') if project.phase1_empatizar else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded h-100 border">
+                            <label class="form-label fw-bold"><i class="fas fa-heart me-2"></i>¿Qué Siente?</label>
+                            <textarea class="form-control" id="p1_siente" rows="4">{{ project.phase1_empatizar.get('siente', '') if project.phase1_empatizar else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded h-100 border">
+                            <label class="form-label fw-bold"><i class="fas fa-comment me-2"></i>¿Qué Dice?</label>
+                            <textarea class="form-control" id="p1_dice" rows="4">{{ project.phase1_empatizar.get('dice', '') if project.phase1_empatizar else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded h-100 border">
+                            <label class="form-label fw-bold"><i class="fas fa-walking me-2"></i>¿Qué Hace?</label>
+                            <textarea class="form-control" id="p1_hace" rows="4">{{ project.phase1_empatizar.get('hace', '') if project.phase1_empatizar else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-end">
+                    <button class="btn btn-primary" onclick="savePhase(1)">
+                        <i class="fas fa-save me-2"></i>Guardar Empatía
+                    </button>
+                    <button class="btn btn-dark ms-2" onclick="continueToNextPhase(1)">
+                        Continuar <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="tab-pane fade" id="fase2">
-        <h4>🎯 Definición del Problema</h4>
-        <p class="text-muted">¿Cuál es el "Insight" o problema central que encontraste?</p>
-        <textarea id="input_phase2" class="form-control" rows="10" placeholder="El problema central es..."></textarea>
-    </div>
+    <!-- PHASE 2: DEFINIR -->
+    <div class="tab-pane fade" id="phase2" role="tabpanel">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Definición del Problema (POV)</h4>
+                
+                <div class="alert alert-info border-info mb-4">
+                    <h5 class="alert-heading"><i class="fas fa-quote-left me-2"></i>Tu Declaración:</h5>
+                    <p class="mb-0 fs-5 text-dark">
+                        "El <strong id="show_usuario">{{ project.phase2_definir.get('usuario', 'USUARIO') if project.phase2_definir else 'USUARIO' }}</strong> 
+                        necesita <strong id="show_necesidad">{{ project.phase2_definir.get('necesidad', 'NECESIDAD') if project.phase2_definir else 'NECESIDAD' }}</strong> 
+                        porque <strong id="show_insight">{{ project.phase2_definir.get('insight', 'INSIGHT') if project.phase2_definir else 'INSIGHT' }}</strong>."
+                    </p>
+                </div>
 
-    <div class="tab-pane fade" id="fase3">
-        <h4>💡 Lluvia de Ideas</h4>
-        <p class="text-muted">Escribe todas las soluciones posibles (Brainstorming).</p>
-        <textarea id="input_phase3" class="form-control" rows="10" placeholder="- Idea 1: ... &#10;- Idea 2: ..."></textarea>
-    </div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded h-100 border text-center">
+                            <label class="form-label fw-bold">Usuario</label>
+                            <input type="text" class="form-control text-center" id="p2_usuario" 
+                                   value="{{ project.phase2_definir.get('usuario', '') if project.phase2_definir else '' }}"
+                                   oninput="updatePOV()">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded h-100 border text-center">
+                            <label class="form-label fw-bold">Necesidad</label>
+                            <input type="text" class="form-control text-center" id="p2_necesidad" 
+                                   value="{{ project.phase2_definir.get('necesidad', '') if project.phase2_definir else '' }}"
+                                   oninput="updatePOV()">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded h-100 border text-center">
+                            <label class="form-label fw-bold">Insight (Porque...)</label>
+                            <input type="text" class="form-control text-center" id="p2_insight" 
+                                   value="{{ project.phase2_definir.get('insight', '') if project.phase2_definir else '' }}"
+                                   oninput="updatePOV()">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="button" class="btn btn-dark" onclick="GoBackPhase(2)">
+                            <i class="fas fa-arrow-left me-2"></i>Anterior
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary ms-2" onclick="savePhase(2)">
+                            <i class="fas fa-save me-2"></i>Guardar Definición
+                        </button>
+                        <button class="btn btn-dark ms-2" onclick="continueToNextPhase(2)">
+                            Continuar <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+    <!-- PHASE 3: IDEAR -->
+    <div class="tab-pane fade" id="phase3" role="tabpanel">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Brainstorming Digital</h4>
+                <p class="text-muted small mb-4">Genera múltiples soluciones. ¡No te limites, toda idea es válida!</p>
+                
+                <div class="input-group mb-4">
+                    <input type="text" id="nueva_idea_input" class="form-control" placeholder="Escribe una idea aquí...">
+                    <button class="btn btn-primary" type="button" onclick="agregarIdea()">
+                        <i class="fas fa-plus me-2"></i>Añadir Idea
+                    </button>
+                </div>
 
-    <div class="tab-pane fade" id="fase4">
-        <h4>🛠️ Prototipo</h4>
-        <p class="text-muted">Describe cómo será tu prototipo inicial (Boceto, Maqueta, Wireframe).</p>
-        <textarea id="input_phase4" class="form-control" rows="10" placeholder="El prototipo consistirá en..."></textarea>
+                <div id="contenedor_ideas" class="row g-3">
+                    {% if project.phase3_idear and project.phase3_idear.get('ideas') %}
+                        {% for idea in project.phase3_idear.get('ideas') %}
+                        <div class="col-md-4 idea-card" data-texto="{{ idea }}">
+                            <div class="p-3 bg-warning text-dark rounded shadow-sm h-100 position-relative border">
+                                {{ idea }}
+                                <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="this.closest('.idea-card').remove()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="button" class="btn btn-dark" onclick="GoBackPhase(3)">
+                            <i class="fas fa-arrow-left me-2"></i>Anterior
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary ms-2" onclick="savePhase(3)">
+                            <i class="fas fa-save me-2"></i>Guardar Ideación
+                        </button>
+                        <button class="btn btn-dark ms-2" onclick="continueToNextPhase(3)">
+                            Continuar <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <!-- PHASE 4: PROTOTIPAR -->
+    <div class="tab-pane fade" id="phase4" role="tabpanel">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Prototipar la Solución</h4>
+                <p class="text-muted small mb-4">Selecciona la mejor idea de tu lluvia de ideas y descríbela a detalle.</p>
 
-    <div class="tab-pane fade" id="fase5">
-        <h4>🧪 Resultados del Testeo</h4>
-        <p class="text-muted">¿Qué funcionó y qué no funcionó al probarlo con usuarios?</p>
-        <textarea id="input_phase5" class="form-control" rows="10" placeholder="Feedback recibido: ..."></textarea>
+                <div class="row g-4">
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">1. Selecciona la idea a prototipar:</label>
+                        <select id="p4_idea_seleccionada" class="form-select mb-3">
+                            <option value="">-- Elige una idea --</option>
+                            {% if project.phase3_idear and project.phase3_idear.get('ideas') %}
+                                {% for idea in project.phase3_idear.get('ideas') %}
+                                    <option value="{{ idea }}" 
+                                        {% if project.phase4_prototipar and project.phase4_prototipar.get('idea_base') == idea %}selected{% endif %}>
+                                        {{ idea }}
+                                    </option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                        <div class="alert alert-light border small">
+                            <i class="fas fa-info-circle me-2"></i> Un prototipo es una representación rápida de tu idea para que otros puedan entenderla.
+                        </div>
+                    </div>
+
+                    <div class="col-md-7">
+                        <label class="form-label fw-bold">2. Descripción detallada del prototipo:</label>
+                        <textarea class="form-control" id="p4_descripcion" rows="6" 
+                            placeholder="¿Cómo funciona? ¿Qué materiales usa? ¿Cómo interactúa el usuario con él?">{{ project.phase4_prototipar.get('descripcion', '') if project.phase4_prototipar else '' }}</textarea>
+                    </div>
+                </div>
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="button" class="btn btn-dark" onclick="GoBackPhase(4)">
+                            <i class="fas fa-arrow-left me-2"></i>Anterior
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary ms-2" onclick="savePhase(4)">
+                            <i class="fas fa-save me-2"></i>Guardar Prototipado
+                        </button>
+                        <button class="btn btn-dark ms-2" onclick="continueToNextPhase(4)">
+                            Continuar <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <!-- PHASE 5: TESTEAR -->
+    <div class="tab-pane fade" id="phase5" role="tabpanel">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title text-primary mb-3">Testear: Malla Receptora de Información</h4>
+                <p class="text-muted small mb-4">Presenta tu prototipo a posibles usuarios y organiza sus comentarios aquí.</p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light">
+                            <label class="form-label fw-bold text-success"><i class="fas fa-plus-circle me-2"></i>¿Qué es lo más interesante?</label>
+                            <textarea class="form-control" id="p5_interesante" rows="3">{{ project.phase5_testear.get('interesante', '') if project.phase5_testear else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light">
+                            <label class="form-label fw-bold text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Críticas Constructivas</label>
+                            <textarea class="form-control" id="p5_criticas" rows="3">{{ project.phase5_testear.get('criticas', '') if project.phase5_testear else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light">
+                            <label class="form-label fw-bold text-info"><i class="fas fa-question-circle me-2"></i>Preguntas o Dudas</label>
+                            <textarea class="form-control" id="p5_preguntas" rows="3">{{ project.phase5_testear.get('preguntas', '') if project.phase5_testear else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-light">
+                            <label class="form-label fw-bold text-warning"><i class="fas fa-lightbulb me-2"></i>Nuevas Ideas Surgidas</label>
+                            <textarea class="form-control" id="p5_nuevas_ideas" rows="3">{{ project.phase5_testear.get('nuevas_ideas', '') if project.phase5_testear else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button type="button" class="btn btn-dark" onclick="GoBackPhase(5)">
+                            <i class="fas fa-arrow-left me-2"></i>Anterior
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary me-2" onclick="savePhase(5)">
+                            <i class="fas fa-save me-2"></i>Guardar Testeo
+                        </button>
+                        <a href="{{ url_for('project_summary', project_id=project.id) }}" class="btn btn-dark">
+                            <i class="fas fa-file-pdf me-2"></i>Ver Resumen Final
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 </div>
 
 <script>
-    // Obtenemos el ID del proyecto desde la URL (FastAPI nos lo pasó en la variable project_id)
-    const projectId = "{{ project_id }}";
-    const token = localStorage.getItem('token');
+    const projectId = "{{ project.id }}";
+    const progresoActual = "{{ total_progress }}"; 
 
-    if (!token) window.location.href = '/login';
-
-    // 1. CARGAR DATOS AL ENTRAR
-    async function loadData() {
-        try {
-            const response = await fetch(`/projects/${projectId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            if(response.ok) {
-                const data = await response.json();
-                // Ponemos el título en la cabecera
-                document.getElementById('projectTitleDisplay').innerText = data.title;
-                
-                // Rellenamos los campos de texto con lo que venga de la base de datos
-                document.getElementById('input_phase1').value = data.phase1_empatizar || "";
-                document.getElementById('input_phase2').value = data.phase2_definir || "";
-                document.getElementById('input_phase3').value = data.phase3_idear || "";
-                document.getElementById('input_phase4').value = data.phase4_prototipar || "";
-                document.getElementById('input_phase5').value = data.phase5_testear || "";
-            } else {
-                alert("Error cargando proyecto");
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Manejo de pestañas persistentes
+        const activeTabTarget = localStorage.getItem("activeTab");
+        if (activeTabTarget) {
+            const tabButton = document.querySelector(`button[data-bs-target="${activeTabTarget}"]`);
+            if (tabButton) {
+                const tab = new bootstrap.Tab(tabButton);
+                tab.show();
             }
-        } catch (e) { console.error(e); }
-    }
+            localStorage.removeItem("activeTab");
+        }
 
-    // 2. GUARDAR DATOS
-    async function saveProject() {
-        const payload = {
-            phase1_empatizar: document.getElementById('input_phase1').value,
-            phase2_definir: document.getElementById('input_phase2').value,
-            phase3_idear: document.getElementById('input_phase3').value,
-            phase4_prototipar: document.getElementById('input_phase4').value,
-            phase5_testear: document.getElementById('input_phase5').value
-        };
+        // 2. Barra de progreso visual
+        try {
+            document.getElementById('barra-progreso').style.width = progresoActual + "%";
+        } catch (e) { console.error("Error al actualizar barra:", e); }
+    });
 
-        const response = await fetch(`/projects/${projectId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if(response.ok) {
-            alert("✅ ¡Cambios guardados correctamente!");
-        } else {
-            alert("❌ Error al guardar.");
+    /**
+     * CAPA 1: Recolección de datos del DOM
+     */
+    function getPhaseData(phaseNumber) {
+        try {
+            if (phaseNumber === 1) {
+                return {
+                    phase1_empatizar: {
+                        piensa: document.getElementById('p1_piensa').value,
+                        siente: document.getElementById('p1_siente').value,
+                        dice: document.getElementById('p1_dice').value,
+                        hace: document.getElementById('p1_hace').value
+                    }
+                };
+            } 
+            if (phaseNumber === 2) {
+                return {
+                    phase2_definir: {
+                        usuario: document.getElementById('p2_usuario').value,
+                        necesidad: document.getElementById('p2_necesidad').value,
+                        insight: document.getElementById('p2_insight').value
+                    }
+                };
+            }   
+            if (phaseNumber === 3) {
+                const tarjetas = document.querySelectorAll('.idea-card');
+                const listaIdeas = Array.from(tarjetas).map(t => t.getAttribute('data-texto'));
+                if (listaIdeas.length === 0) {
+                    alert("⚠️ Agrega al menos una idea.");
+                    return null;
+                }
+                return { phase3_idear: { ideas: listaIdeas } };
+            }
+            if (phaseNumber === 4) {
+                const idea = document.getElementById('p4_idea_seleccionada').value;
+                const desc = document.getElementById('p4_descripcion').value;
+                if (!idea || desc.length < 10) {
+                    alert("⚠️ Selecciona una idea y descríbela (mín. 10 caracteres).");
+                    return null;
+                }
+                return { phase4_prototipar: { idea_base: idea, descripcion: desc } };
+            }
+            if (phaseNumber === 5) {
+                return { 
+                    phase5_testear: { 
+                        interesante: document.getElementById('p5_interesante').value,
+                        criticas: document.getElementById('p5_criticas').value,
+                        preguntas: document.getElementById('p5_preguntas').value,
+                        nuevas_ideas: document.getElementById('p5_nuevas_ideas').value
+                    } 
+                };
+            }
+        } catch (error) {
+            console.error("Error recolectando datos:", error);
+            return null;
         }
     }
 
-    // Iniciar carga
-    loadData();
+    /**
+     * CAPA 2: Comunicación con el Servidor
+     */
+    async function sendDataToServer(data) {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            alert("⚠️ Sesión no encontrada. Inicia sesión nuevamente.");
+            window.location.href = "/login";
+            return false;
+        }
+
+        try {
+            const response = await fetch(`/projects/${projectId}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) return true;
+
+            if (response.status === 401) {
+                alert('⏳ Tu sesión ha expirado.');
+                window.location.href = "/login";
+            } else {
+                const err = await response.json();
+                alert('❌ Error: ' + (err.message || 'No se pudo guardar'));
+            }
+            return false;
+        } catch (error) {
+            console.error("Fetch error:", error);
+            alert('⚠️ Error de conexión con el servidor.');
+            return false;
+        }
+    }
+
+    /**
+     * CAPA 3: Acciones de Usuario
+     */
+    async function GoBackPhase(currentPhase) {
+        const data = getPhaseData(currentPhase);
+        
+        if (!data) {
+            localStorage.setItem("activeTab", "#phase" + (currentPhase - 1));
+            location.reload();
+            return;
+        }
+
+        const success = await sendDataToServer(data);
+        
+        localStorage.setItem("activeTab", "#phase" + (currentPhase - 1));
+        location.reload(); 
+    }
+
+    async function continueToNextPhase(phaseNumber) {
+        const data = getPhaseData(phaseNumber);
+        if (!data) return;
+
+        const success = await sendDataToServer(data);
+        if (success) {
+            // Guardar la siguiente fase para la recarga
+            localStorage.setItem("activeTab", "#phase" + (phaseNumber + 1));
+            location.reload(); 
+        }
+    }
+
+    async function savePhase(phaseNumber) {
+        const data = getPhaseData(phaseNumber);
+        if (!data) {
+            showModal('Datos incompletos', 'Por favor completa los campos requeridos antes de guardar.', null);
+            return;
+        }
+        
+        const success = await sendDataToServer(data);
+        if (success) {
+            showModal('¡Guardado!', 'Tus cambios se guardaron correctamente.', null);
+        }
+    }
+
+    // Funciones auxiliares visuales
+    function updatePOV() {
+        try {
+            document.getElementById('show_usuario').innerText = document.getElementById('p2_usuario').value || 'USUARIO';
+            document.getElementById('show_necesidad').innerText = document.getElementById('p2_necesidad').value || 'NECESIDAD';
+            document.getElementById('show_insight').innerText = document.getElementById('p2_insight').value || 'INSIGHT';
+        } catch(e) {}
+    }
+
+    function agregarIdea() {
+        const input = document.getElementById('nueva_idea_input');
+        const texto = input.value.trim();
+        if (texto === "") return;
+
+        const contenedor = document.getElementById('contenedor_ideas');
+        const nuevaTarjeta = `
+            <div class="col-md-4 idea-card" data-texto="${texto}">
+                <div class="p-3 bg-warning text-dark rounded shadow-sm h-100 position-relative border">
+                    ${texto}
+                    <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" onclick="this.closest('.idea-card').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        contenedor.insertAdjacentHTML('beforeend', nuevaTarjeta);
+        input.value = ""; 
+    }
 </script>
+
 {% endblock %}

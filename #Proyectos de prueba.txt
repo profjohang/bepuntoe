@@ -1,0 +1,321 @@
+# Proyectos de prueba – App b.e
+
+Este documento reúne **cuatro proyectos de prueba completos**, diseñados para que estudiantes puedan recorrer todas las fases del proceso de emprendimiento dentro de la app **b.e**. Las ideas son realistas, escolares y fáciles de prototipar.
+
+---
+
+# 🌿 PROYECTO 1: **RefillSchool**
+
+### 📌 Descripción
+
+Puntos de recarga de bebidas naturales dentro del colegio para reducir el consumo de botellas plásticas.
+
+---
+
+## 1️⃣ EMPATIZAR – Mapa de Empatía
+
+### 🧠 ¿Qué piensa?
+
+Los estudiantes creen que comprar bebidas en botellas plásticas es cómodo, pero reconocen que generan mucha basura y que no existen alternativas sostenibles dentro del colegio.
+
+### ❤️ ¿Qué siente?
+
+Sienten preocupación por el daño ambiental, pero también comodidad por seguir comprando lo mismo. Algunos sienten culpa por contaminar.
+
+### 🗣️ ¿Qué dice?
+
+“Siempre compro gaseosa”,
+“Eso llena de plástico el colegio”,
+“Si pudiera recargar mi botella, lo haría”.
+
+### 🏃 ¿Qué hace?
+
+Compra bebidas embotelladas, bota las botellas y repite el hábito diariamente.
+
+---
+
+## 2️⃣ DEFINIR – POV
+
+**Declaración POV:**
+El estudiante necesita una forma práctica de consumir bebidas dentro del colegio sin generar residuos plásticos porque actualmente solo puede comprar productos en botellas desechables.
+
+* **Usuario:** Estudiantes de secundaria
+* **Necesidad:** Acceso a bebidas prácticas y sostenibles
+* **Insight:** La conciencia ambiental no cambia hábitos si no hay alternativas fáciles
+
+---
+
+## 3️⃣ IDEAR – Lluvia de Ideas
+
+* Estaciones de recarga de agua
+* Bebidas naturales concentradas
+* Descuentos por traer botella reutilizable
+* Campañas ecológicas
+
+👉 **Idea seleccionada:** Estación RefillSchool
+
+---
+
+## 4️⃣ PROTOTIPAR
+
+**Descripción del prototipo:**
+RefillSchool es una estación con dispensadores de agua y bebidas naturales donde los estudiantes pueden rellenar sus botellas reutilizables pagando un valor bajo.
+
+---
+
+## 5️⃣ TESTEAR – Malla Receptora
+
+### ✅ Interesante
+
+Reducción de plástico y ahorro de dinero
+
+### ❌ Críticas
+
+No todos tienen botella reutilizable
+
+### ❓ Dudas
+
+¿Quién limpia los dispensadores?
+
+### 💡 Nuevas ideas
+
+Venta de botellas ecológicas en el colegio
+
+---
+
+---
+
+# 🍱 PROYECTO 2: **BreakBox Escolar**
+
+### 📌 Descripción
+
+Sistema de combos de meriendas saludables preparados por estudiantes y vendidos durante el descanso.
+
+---
+
+## 1️⃣ EMPATIZAR – Mapa de Empatía
+
+### 🧠 ¿Qué piensa?
+
+Los estudiantes creen que la comida del colegio es poco saludable y repetitiva.
+
+### ❤️ ¿Qué siente?
+
+Sienten aburrimiento y cansancio de siempre comer lo mismo.
+
+### 🗣️ ¿Qué dice?
+
+“Siempre venden papas”,
+“Eso no llena”,
+“Quisiera algo diferente”.
+
+### 🏃 ¿Qué hace?
+
+Compra lo que hay, aunque no le guste mucho.
+
+---
+
+## 2️⃣ DEFINIR – POV
+
+**Declaración POV:**
+El estudiante necesita opciones de comida variada y saludable durante el descanso porque la oferta actual es limitada y poco nutritiva.
+
+* **Usuario:** Estudiantes de secundaria
+* **Necesidad:** Meriendas variadas y saludables
+* **Insight:** La falta de variedad mantiene hábitos poco saludables
+
+---
+
+## 3️⃣ IDEAR – Lluvia de Ideas
+
+* Combos saludables
+* Menú semanal
+* Participación estudiantil
+* Empaques ecológicos
+
+👉 **Idea seleccionada:** BreakBox Escolar
+
+---
+
+## 4️⃣ PROTOTIPAR
+
+**Descripción del prototipo:**
+BreakBox es un sistema de cajas con meriendas saludables (fruta, sándwich integral, jugo natural) vendidas en empaques biodegradables, preparadas por estudiantes con supervisión.
+
+---
+
+## 5️⃣ TESTEAR – Malla Receptora
+
+### ✅ Interesante
+
+Apoya el emprendimiento estudiantil
+
+### ❌ Críticas
+
+Requiere organización y permisos
+
+### ❓ Dudas
+
+¿Quién prepara la comida?
+
+### 💡 Nuevas ideas
+
+Pedidos anticipados por curso
+
+---
+
+---
+
+# 🧽 PROYECTO 3: **EcoClean Desk**
+
+### 📌 Descripción
+
+Servicio rápido de limpieza y cuidado de pupitres y mesas escolares utilizando productos ecológicos.
+
+---
+
+## 1️⃣ EMPATIZAR – Mapa de Empatía
+
+### 🧠 ¿Qué piensa?
+
+Los estudiantes notan que los pupitres están rayados o sucios, pero sienten que no es su responsabilidad limpiarlos.
+
+### ❤️ ¿Qué siente?
+
+Incomodidad, fastidio o resignación al usar espacios deteriorados.
+
+### 🗣️ ¿Qué dice?
+
+“Ese pupitre siempre está sucio”,
+“Nadie cuida esto”.
+
+### 🏃 ¿Qué hace?
+
+Usa el pupitre así esté sucio o lo ignora.
+
+---
+
+## 2️⃣ DEFINIR – POV
+
+**Declaración POV:**
+El estudiante necesita espacios de trabajo limpios porque pasa muchas horas en el aula y no existen soluciones rápidas para el cuidado diario del mobiliario.
+
+* **Usuario:** Estudiantes de secundaria
+* **Necesidad:** Espacios limpios y agradables
+* **Insight:** Cuando nadie se siente responsable, el deterioro se normaliza
+
+---
+
+## 3️⃣ IDEAR – Lluvia de Ideas
+
+* Jornadas de limpieza
+* Kits ecológicos
+* Turnos por curso
+
+👉 **Idea seleccionada:** EcoClean Desk
+
+---
+
+## 4️⃣ PROTOTIPAR
+
+**Descripción del prototipo:**
+Servicio express de limpieza de pupitres realizado por estudiantes a cambio de un pago simbólico o puntos.
+
+---
+
+## 5️⃣ TESTEAR – Malla Receptora
+
+### ✅ Interesante
+
+Mejora el ambiente escolar
+
+### ❌ Críticas
+
+Puede verse como tarea del colegio
+
+### ❓ Dudas
+
+¿En qué horarios se hace?
+
+### 💡 Nuevas ideas
+
+Sistema de recompensas colectivas
+
+---
+
+---
+
+# 📓 PROYECTO 4: **PrintSmart Escolar**
+
+### 📌 Descripción
+
+Servicio estudiantil de impresión y copias para trabajos escolares.
+
+---
+
+## 1️⃣ EMPATIZAR – Mapa de Empatía
+
+### 🧠 ¿Qué piensa?
+
+No todos los estudiantes tienen impresora en casa.
+
+### ❤️ ¿Qué siente?
+
+Estrés cuando los trabajos son urgentes.
+
+### 🗣️ ¿Qué dice?
+
+“No alcancé a imprimir”,
+“La papelería queda lejos”.
+
+### 🏃 ¿Qué hace?
+
+Pide favores o entrega trabajos a mano.
+
+---
+
+## 2️⃣ DEFINIR – POV
+
+**Declaración POV:**
+El estudiante necesita imprimir trabajos de forma rápida porque no siempre tiene acceso a una impresora.
+
+* **Usuario:** Estudiantes de secundaria
+* **Necesidad:** Acceso fácil a impresión
+* **Insight:** La urgencia académica amplifica problemas simples
+
+---
+
+## 3️⃣ IDEAR – Lluvia de Ideas
+
+* Punto de impresión
+* Pedidos por QR
+* Paquetes por curso
+
+👉 **Idea seleccionada:** PrintSmart Escolar
+
+---
+
+## 4️⃣ PROTOTIPAR
+
+**Descripción del prototipo:**
+Punto de impresión gestionado por estudiantes donde se reciben archivos digitales y se entregan copias durante el descanso.
+
+---
+
+## 5️⃣ TESTEAR – Malla Receptora
+
+### ✅ Interesante
+
+Ahorra tiempo y reduce estrés
+
+### ❌ Críticas
+
+Costo del papel y tinta
+
+### ❓ Dudas
+
+¿Quién presta la impresora?
+
+### 💡 Nuevas ideas
+
+Impresiones grupales con descuento

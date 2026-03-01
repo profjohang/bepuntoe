@@ -1,43 +1,118 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-1 text-primary">Hola, <span id="display_name">Cargando...</span> 👋</h4>
+            <p class="text-muted mb-0">
+                <i class="fas fa-birthday-cake me-1"></i> <span id="display_age">...</span> años | 
+                <i class="fas fa-school me-1"></i> <span id="display_school">...</span> | 
+                <i class="fas fa-graduation-cap me-1"></i> <span id="display_grade">...</span>
+            </p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <i class="fas fa-pen"></i> Editar Perfil
+        </button>
+    </div>
+</div>
+
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar mis datos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-control" id="edit_fullname">
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="edit_birth_date">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Grado / Curso</label>
+                            <input type="text" class="form-control" id="edit_grade">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Colegio</label>
+                        <input type="text" class="form-control" id="edit_school">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveProfile()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mb-4 align-items-center">
     <div class="col">
         <h2 class="fw-bold text-dark">Mis Proyectos</h2>
         <p class="text-muted">Gestiona tus ideas de emprendimiento</p>
     </div>
     <div class="col-auto">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProjectModal">
             + Nuevo Proyecto
         </button>
     </div>
 </div>
 
-<div class="row" id="projectsContainer">
-    <div class="col-12 text-center mt-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p>Cargando tus proyectos...</p>
+<div class="row" id="projects-container">
     </div>
-</div>
 
-<div class="modal fade" id="createModal" tabindex="-1">
+<div class="modal fade" id="createProjectModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Comenzar una nueva idea</h5>
+                <h5 class="modal-title">Nueva Idea</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="createProjectForm">
                     <div class="mb-3">
-                        <label class="form-label">Nombre del Proyecto</label>
-                        <input type="text" class="form-control" id="projectTitle" required placeholder="Ej: Venta de Postres Saludables">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="new_title" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Breve Descripción</label>
-                        <textarea class="form-control" id="projectDesc" rows="3" required placeholder="¿De qué trata tu idea?"></textarea>
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" id="new_desc" rows="3" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Crear Proyecto</button>
+                    <button type="submit" class="btn btn-primary w-100">Crear</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editProjectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Proyecto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProjectForm">
+                    <input type="hidden" id="edit_project_id">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="edit_title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" id="edit_desc" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
                 </form>
             </div>
         </div>
@@ -45,81 +120,240 @@
 </div>
 
 <script>
-    // 1. REVISAR SI HAY SESIÓN
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '/login'; // Si no hay token, mandar al login
+    const token = localStorage.getItem("access_token");
+    
+    if (!token) window.location.href = "/login";
+
+    async function loadUserProfile() {
+        const token = localStorage.getItem("access_token");
+        if (!token) return; 
+
+        try {
+            const response = await fetch("/users/me", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            
+            if (response.ok) {
+                const user = await response.json();
+
+                // Calcular edad desde birth_date
+                let age = "N/A";
+                
+                if (user.birth_date) {
+                    try {
+                        const birthDate = new Date(user.birth_date);
+                        const today = new Date();
+                        
+                        if (!isNaN(birthDate.getTime())) {
+                            age = today.getFullYear() - birthDate.getFullYear();
+                            const monthDiff = today.getMonth() - birthDate.getMonth();
+                            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                                age--;
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Error al calcular edad:", error);
+                    }
+                }
+                
+                // Rellenar la Tarjeta Principal
+                document.getElementById("display_name").innerText = user.full_name || user.username;
+                document.getElementById("display_age").innerText = age;
+                document.getElementById("display_school").innerText = user.school || "Sin colegio";
+                document.getElementById("display_grade").innerText = user.grade || "Sin grado";
+
+                // Rellenar el Formulario del Modal
+                document.getElementById("edit_fullname").value = user.full_name || "";
+                document.getElementById("edit_birth_date").value = user.birth_date || "";
+                document.getElementById("edit_school").value = user.school || "";
+                document.getElementById("edit_grade").value = user.grade || "";
+            }
+        } catch (error) {
+            console.error("Error cargando perfil:", error);
+        }
     }
 
-    // 2. FUNCIÓN PARA CARGAR PROYECTOS
-    async function loadProjects() {
+    async function saveProfile() {
+        const token = localStorage.getItem("access_token"); 
+        
+        const data = {
+            full_name: document.getElementById('edit_fullname').value,
+            birth_date: document.getElementById('edit_birth_date').value,
+            school: document.getElementById('edit_school').value,
+            grade: document.getElementById('edit_grade').value
+        };
+
         try {
-            const response = await fetch('/projects/', {
-                headers: { 'Authorization': `Bearer ${token}` }
+            const response = await fetch("/users/me/profile", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
             });
 
             if (response.ok) {
-                const projects = await response.json();
-                const container = document.getElementById('projectsContainer');
-                container.innerHTML = ''; // Limpiar cargando
-
-                if (projects.length === 0) {
-                    container.innerHTML = '<div class="col-12 text-center text-muted"><h4>No tienes proyectos aún. ¡Crea el primero! 🚀</h4></div>';
-                    return;
-                }
-
-                // Dibujar una tarjeta por cada proyecto
-                projects.forEach(p => {
-                    const card = `
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100 shadow-sm border-0">
-                                <div class="card-body">
-                                    <h5 class="card-title fw-bold text-primary">${p.title}</h5>
-                                    <p class="card-text text-secondary">${p.description}</p>
-                                </div>
-                                <div class="card-footer bg-white border-0 text-end">
-                                    <a href="/project/view/${p.id}" class="btn btn-outline-primary btn-sm">Continuar Trabajando &rarr;</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += card;
+                // Mostrar el modal y PASAR la función de recarga como callback
+                showModal('¡Logrado!', 'Tu perfil se ha actualizado con éxito.', function() {
+                    location.reload(); 
                 });
+                
             } else {
-                alert("Tu sesión expiró. Ingresa nuevamente.");
-                window.location.href = '/login';
+                showModal('Error', '❌ Hubo un error al actualizar los datos del perfil.', null);
             }
         } catch (error) {
-            console.error(error);
+            console.error("Error en la petición:", error);
+            showModal('Error de Conexión', '⚠️ No se pudo conectar con el servidor.', null);
         }
     }
 
-    // 3. FUNCIÓN PARA CREAR NUEVO PROYECTO
-    document.getElementById('createProjectForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const title = document.getElementById('projectTitle').value;
-        const desc = document.getElementById('projectDesc').value;
+    async function loadProjects() {
+        const response = await fetch('/projects/', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (response.status === 401) window.location.href = "/login";
+        
+        const projects = await response.json();
+        const container = document.getElementById('projects-container');
+        container.innerHTML = '';
 
-        const response = await fetch('/projects/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ title: title, description: desc })
+        projects.forEach(p => {
+            // 🔧 Crear elementos del DOM en lugar de HTML string
+            const col = document.createElement('div');
+            col.className = 'col-md-4 mb-4';
+            col.id = `project-card-${p.id}`;
+            
+            col.innerHTML = `
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="fw-bold project-title"></h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-link text-muted" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item btn-edit" href="#">
+                                        <i class="fas fa-edit me-2"></i>Editar
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger btn-delete" href="#">
+                                        <i class="fas fa-trash me-2"></i>Eliminar
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="text-muted small project-description"></p>
+                    <div class="mt-3">
+                        <a href="/project/view/${p.id}" class="btn btn-primary w-100">Abrir</a>                        
+                    </div>
+                </div>
+            </div>`;
+            
+            // ✅ Asignar texto de forma segura (evita problemas con comillas)
+            col.querySelector('.project-title').textContent = p.title;
+            col.querySelector('.project-description').textContent = p.description;
+            
+            // ✅ Asignar event listeners de forma segura
+            const btnEdit = col.querySelector('.btn-edit');
+            btnEdit.addEventListener('click', (e) => {
+                e.preventDefault();
+                openEditModal(p.id, p.title, p.description);
+            });
+            
+            const btnDelete = col.querySelector('.btn-delete');
+            btnDelete.addEventListener('click', (e) => {
+                e.preventDefault();
+                deleteProject(p.id, p.title);
+            });
+            
+            container.appendChild(col);
         });
+    }
 
-        if (response.ok) {
-            // Cerrar modal y recargar lista
-            bootstrap.Modal.getInstance(document.getElementById('createModal')).hide();
-            document.getElementById('createProjectForm').reset();
-            loadProjects(); 
-        } else {
-            alert("Error al crear el proyecto");
-        }
+    function openEditModal(id, title, desc) {
+        document.getElementById('edit_project_id').value = id;
+        document.getElementById('edit_title').value = title;
+        document.getElementById('edit_desc').value = desc;
+        new bootstrap.Modal(document.getElementById('editProjectModal')).show();
+    }
+
+    document.getElementById('editProjectForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('edit_project_id').value;
+        const res = await fetch(`/projects/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ title: document.getElementById('edit_title').value, description: document.getElementById('edit_desc').value })
+        });
+        if (res.ok) location.reload();
     });
 
-    // Cargar proyectos al abrir la página
-    loadProjects();
+    async function deleteProject(id, title) {
+        const token = localStorage.getItem("access_token");
+        // 1. Primera confirmación
+        showModal(
+            '¿Borrar proyecto?', 
+            `¿Estás seguro de que quieres borrar "${title}"?`, 
+            function() {
+                // Esperar un momento para mejorar la experiencia
+                setTimeout(() => {
+                    
+                    // 2. Validación definitiva
+                    showModal(
+                        'Confirmación Final', 
+                        'Esta acción es definitiva y no se puede deshacer. ¿Confirmas la eliminación?', 
+                        async function() {
+                            try {
+                                const res = await fetch(`/projects/${id}`, { 
+                                    method: 'DELETE', 
+                                    headers: { 'Authorization': `Bearer ${token}` } 
+                                });
+
+                                if (res.ok) {
+                                    // 3. Eliminación visual
+                                    const element = document.getElementById(`project-card-${id}`);
+                                    if (element) element.remove();
+                                    
+                                    // Feedback de éxito
+                                    setTimeout(() => {
+                                        showModal('Eliminado', 'El proyecto ha sido borrado correctamente.', null);
+                                    }, 300);
+                                } else {
+                                    showModal('Error', 'No se pudo eliminar el proyecto.', null);
+                                }
+                            } catch (error) {
+                                console.error("Error en la petición:", error);
+                                showModal('Error', 'Ocurrió un error de red.', null);
+                            }
+                        }
+                    );
+                }, 300); 
+            }
+        );
+    }
+
+    document.getElementById('createProjectForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const res = await fetch('/projects/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ title: document.getElementById('new_title').value, description: document.getElementById('new_desc').value })
+        });
+        if (res.ok) location.reload();
+    });
+
+    if (token) {
+        document.getElementById('btnLogout').style.display = 'block';
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+            loadUserProfile();  // Carga los datos del estudiante 
+            loadProjects();     // Carga las tarjetas de los proyectos
+        });
+
 </script>
 {% endblock %}
+

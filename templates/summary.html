@@ -2,74 +2,188 @@
 
 {% block content %}
 <style>
-    /* Estilos para que el reporte se vea bien en pantalla e impreso */
-    .summary-card { border-left: 5px solid #e67e22; margin-bottom: 20px; }
-    
-    @media print {
-        .no-print { display: none !important; }
-        body { background-color: white !important; }
-        .card { 
-            border: 1px solid #ccc !important; 
-            box-shadow: none !important; 
-        }
-        .summary-card { border-left: 5px solid #e67e22 !important; }
+    :root {
+        --be-blue: #32408C;
+        --be-dark-blue: #2E3959;
+        --be-light-gray: #f8f9fa;
     }
+
+    .summary-header {
+        background: white;
+        padding: 3rem 2rem; 
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-bottom: 2.5rem;
+        border-top: 8px solid var(--be-blue); 
+        border-left: none; 
+    }
+
+    .phase-card {
+        background: white;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .phase-badge {
+        background-color: var(--be-blue);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        display: inline-block;
+    }
+
+    .data-box {
+        background: var(--be-light-gray);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 3px solid #dee2e6;
+    }
+
+    .data-label {
+        font-size: 0.7rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        font-weight: bold;
+        display: block;
+    }
+
+    .data-value {
+        color: var(--be-dark-blue);
+        font-weight: 500;
+        margin-bottom: 0;
+        white-space: pre-wrap;
+    }
+
+    .badge-idea {
+        background: white;
+        border: 1px solid var(--be-blue);
+        color: var(--be-blue);
+        padding: 4px 10px;
+        border-radius: 6px;
+        margin: 2px;
+        display: inline-block;
+    }
+
+    .empty-state { color: #adb5bd; font-style: italic; font-size: 0.85rem; }
+
+    @media print { .no-print { display: none; } }
 </style>
 
-<div class="row mb-4 no-print">
-    <div class="col">
-        <a href="/project/view/{{ project_id }}" class="btn btn-outline-secondary">&larr; Volver al editor</a>
-    </div>
-    <div class="col-auto">
-        <button onclick="window.print()" class="btn btn-dark">🖨️ Imprimir Reporte</button>
-    </div>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <a href="/project/view/{{ project.id }}" class="btn btn-dark">
+        <i class="fas fa-arrow-left me-2"></i>Volver al editor
+    </a>
+    <button onclick="window.print()" class="btn btn-primary">
+        <i class="fas fa-print me-2"></i>Imprimir Resumen
+    </button>
 </div>
 
-<div id="reportArea">
-    <div class="text-center mb-5">
-        <h1 class="fw-bold display-5" id="sumTitle">Cargando Proyecto...</h1>
-        <p class="lead text-muted" id="sumDesc"></p>
-        <hr class="my-4" style="border-top: 3px solid #2c3e50; width: 50px; margin: auto;">
+<div class="summary-header text-center">
+    <div class="py-2">
+        <h1 class="fw-bold mb-3" style="color: var(--be-blue); font-size: 2.5rem;">
+            {{ project.title }}
+        </h1>
+        <div class="mx-auto" style="max-width: 800px;">
+            <p class="text-muted lead">
+                {{ project.description }}
+            </p>
+        </div>
     </div>
 
-    <div class="row g-4">
+    <div class="row">
         <div class="col-12">
-            <div class="card summary-card shadow-sm">
-                <div class="card-body">
-                    <h4 class="fw-bold text-primary">1. Empatizar</h4>
-                    <p id="sumPhase1" style="white-space: pre-wrap;"></p>
+            <div class="card phase-card p-4">
+                <span class="phase-badge">Fase 1: Empatizar</span>
+                <h5 class="fw-bold mb-3">Mapa de Empatía</h5>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="data-box">
+                            <span class="data-label">¿Qué dice?</span>
+                            <p class="data-value" id="sum_p1_dice">-</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="data-box">
+                            <span class="data-label">¿Qué hace?</span>
+                            <p class="data-value" id="sum_p1_hace">-</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="data-box">
+                            <span class="data-label">¿Qué piensa?</span>
+                            <p class="data-value" id="sum_p1_piensa">-</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="data-box">
+                            <span class="data-label">¿Qué siente?</span>
+                            <p class="data-value" id="sum_p1_siente">-</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-12">
-            <div class="card summary-card shadow-sm">
-                <div class="card-body">
-                    <h4 class="fw-bold text-primary">2. Definir</h4>
-                    <p id="sumPhase2" style="white-space: pre-wrap;"></p>
+
+        <div class="col-md-6">
+            <div class="card phase-card p-4 h-100">
+                <span class="phase-badge">Fase 2: Definir</span>
+                <h5 class="fw-bold mb-3">Definición del Problema (POV)</h5>
+                <div class="data-box">
+                    <span class="data-label">El Usuario</span>
+                    <p class="data-value" id="sum_p2_usuario">-</p>
+                </div>
+                <div class="data-box">
+                    <span class="data-label">La Necesidad</span>
+                    <p class="data-value" id="sum_p2_necesidad">-</p>
+                </div>
+                <div class="data-box">
+                    <span class="data-label">Insight / Revelación</span>
+                    <p class="data-value" id="sum_p2_insight">-</p>
                 </div>
             </div>
         </div>
-        <div class="col-12">
-            <div class="card summary-card shadow-sm">
-                <div class="card-body">
-                    <h4 class="fw-bold text-primary">3. Idear</h4>
-                    <p id="sumPhase3" style="white-space: pre-wrap;"></p>
+
+        <div class="col-md-6">
+            <div class="card phase-card p-4 h-100">
+                <span class="phase-badge">Fase 3: Idear</span>
+                <h5 class="fw-bold mb-3">Brainstorming Digital</h5>
+                <div id="sumPhase3_container">
+                    </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-4">
+            <div class="card phase-card p-4 h-100">
+                <span class="phase-badge">Fase 4: Prototipar</span>
+                <h5 class="fw-bold mb-3">Prototipo de la Solución</h5>
+                <div class="data-box">
+                    <span class="data-label">Idea Seleccionada</span>
+                    <p class="data-value fw-bold" id="sum_p4_base">-</p>
+                </div>
+                <div class="data-box">
+                    <span class="data-label">Descripción</span>
+                    <p class="data-value" id="sum_p4_desc">-</p>
                 </div>
             </div>
         </div>
-        <div class="col-12">
-            <div class="card summary-card shadow-sm">
-                <div class="card-body">
-                    <h4 class="fw-bold text-primary">4. Prototipar</h4>
-                    <p id="sumPhase4" style="white-space: pre-wrap;"></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12">
-            <div class="card summary-card shadow-sm">
-                <div class="card-body">
-                    <h4 class="fw-bold text-primary">5. Testear</h4>
-                    <p id="sumPhase5" style="white-space: pre-wrap;"></p>
+
+        <div class="col-md-6 mt-4">
+            <div class="card phase-card p-4 h-100">
+                <span class="phase-badge">Fase 5: Testear</span>
+                <h5 class="fw-bold mb-3">Malla Receptora de información</h5>
+                <div class="row g-2">
+                    <div class="col-6"><div class="data-box small"><span class="data-label">Interesante</span><p id="sum_p5_int">-</p></div></div>
+                    <div class="col-6"><div class="data-box small"><span class="data-label">Críticas</span><p id="sum_p5_crit">-</p></div></div>
+                    <div class="col-6"><div class="data-box small"><span class="data-label">Preguntas</span><p id="sum_p5_preg">-</p></div></div>
+                    <div class="col-6"><div class="data-box small"><span class="data-label">Nuevas Ideas</span><p id="sum_p5_new">-</p></div></div>
                 </div>
             </div>
         </div>
@@ -77,24 +191,53 @@
 </div>
 
 <script>
-    const projectId = "{{ project_id }}";
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("access_token");
+    const projectId = "{{ project.id }}";
 
-    async function fetchSummary() {
-        const response = await fetch(`/projects/${projectId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if(response.ok) {
-            const data = await response.json();
-            document.getElementById('sumTitle').innerText = data.title;
-            document.getElementById('sumDesc').innerText = data.description;
-            document.getElementById('sumPhase1').innerText = data.phase1_empatizar || "Sin completar.";
-            document.getElementById('sumPhase2').innerText = data.phase2_definir || "Sin completar.";
-            document.getElementById('sumPhase3').innerText = data.phase3_idear || "Sin completar.";
-            document.getElementById('sumPhase4').innerText = data.phase4_prototipar || "Sin completar.";
-            document.getElementById('sumPhase5').innerText = data.phase5_testear || "Sin completar.";
-        }
+    async function loadSummary() {
+        try {
+            const response = await fetch('/projects/', { headers: { 'Authorization': `Bearer ${token}` } });
+            const projects = await response.json();
+            const project = projects.find(p => p.id == projectId);
+
+            if (project) {
+                const check = (val) => val || '<span class="empty-state">No registrado</span>';
+
+                // P1: Mapa Empatía
+                const p1 = project.phase1_empatizar || {};
+                document.getElementById('sum_p1_dice').innerHTML = check(p1.dice);
+                document.getElementById('sum_p1_hace').innerHTML = check(p1.hace);
+                document.getElementById('sum_p1_piensa').innerHTML = check(p1.piensa);
+                document.getElementById('sum_p1_siente').innerHTML = check(p1.siente);
+
+                // P2: POV
+                const p2 = project.phase2_definir || {};
+                document.getElementById('sum_p2_usuario').innerHTML = check(p2.usuario);
+                document.getElementById('sum_p2_necesidad').innerHTML = check(p2.necesidad);
+                document.getElementById('sum_p2_insight').innerHTML = check(p2.insight);
+
+                // P3: Ideas
+                const p3 = project.phase3_idear || { ideas: [] };
+                const p3Cont = document.getElementById('sumPhase3_container');
+                if (p3.ideas.length > 0) {
+                    p3.ideas.forEach(i => {
+                        p3Cont.innerHTML += `<span class="badge-idea shadow-sm">${i}</span>`;
+                    });
+                } else { p3Cont.innerHTML = '<p class="empty-state">Sin ideas registradas</p>'; }
+
+                // P4 y P5
+                const p4 = project.phase4_prototipar || {};
+                document.getElementById('sum_p4_base').innerHTML = check(p4.idea_base);
+                document.getElementById('sum_p4_desc').innerHTML = check(p4.descripcion);
+
+                const p5 = project.phase5_testear || {};
+                document.getElementById('sum_p5_int').innerHTML = check(p5.interesante);
+                document.getElementById('sum_p5_crit').innerHTML = check(p5.criticas);
+                document.getElementById('sum_p5_preg').innerHTML = check(p5.preguntas);
+                document.getElementById('sum_p5_new').innerHTML = check(p5.nuevas_ideas);
+            }
+        } catch (e) { console.error(e); }
     }
-    fetchSummary();
+    loadSummary();
 </script>
 {% endblock %}

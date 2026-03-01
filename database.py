@@ -1,20 +1,19 @@
-# database.py
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 
-# 1. Definimos que usaremos SQLite (un archivo local) en lugar de un servidor complejo.
-#    El archivo se llamará "b_e_database.db"
-SQLALCHEMY_DATABASE_URL = "sqlite:///./b_e_database.db"
+# Cargar variables de entorno
+load_dotenv()
 
-# 2. Motor de conexión.
-#    "connect_args" es necesario solo para SQLite.
+# Leer la URL de la base de datos desde .env
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:@localhost:3307/b_e_database")
+
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL
 )
 
-# 3. "Sesión" (es lo que usaremos para guardar y pedir datos)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# 4. Clase "Base" será la mamá de todos nuestros modelos (tablas)
 Base = declarative_base()
